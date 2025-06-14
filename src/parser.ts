@@ -83,7 +83,17 @@ function matchOperator(
 function value(scanner: Scanner): LogicalExpression {
   const nextToken = scanner.next()
   if (nextToken?.type === 'literal') {
-    return { type: 'value', value: Number(nextToken.value) }
+    return {
+      type: 'value',
+      value: { type: 'constant', value: Number(nextToken.value) },
+    }
+  }
+
+  if (nextToken?.type === 'parameter') {
+    return {
+      type: 'value',
+      value: { type: 'parameter', name: nextToken.name },
+    }
   }
 
   if (nextToken?.type === 'group-open') {

@@ -6,3 +6,4 @@ export type Token =
     }
   | { type: 'group-open' }
   | { type: 'group-close' }
+  | { type: 'parameter'; name: string }

@@ -12,4 +12,9 @@ export type LogicalExpression =
       right: LogicalExpression
     }
   | { type: 'unary'; expression: LogicalExpression }
-  | { type: 'value'; value: number }
+  | {
+      type: 'value'
+      value:
+        | { type: 'constant'; value: number }
+        | { type: 'parameter'; name: string }
+    }

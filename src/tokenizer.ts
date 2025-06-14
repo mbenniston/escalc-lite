@@ -17,6 +17,8 @@ export class Tokenizer implements Iterator<Token> {
       return this.groupOpen()
     } else if (isGroupClose(nextCharacter)) {
       return this.groupClose()
+    } else if (isParameter(nextCharacter)) {
+      return this.parameter()
     } else {
       throw new Error(`unrecognised input '${nextCharacter}'`)
     }
@@ -56,6 +58,22 @@ export class Tokenizer implements Iterator<Token> {
     this.source.next()
     return { type: 'group-close' }
   }
+
+  private parameter(): Token {
+    this.source.next()
+
+    let name = ''
+    let nextCharacter = this.source.peek
+    while (nextCharacter !== ']' && nextCharacter !== null) {
+      name += nextCharacter
+      this.source.next()
+      nextCharacter = this.source.peek
+    }
+
+    if (this.source.next() !== ']') throw new Error('Expected ]')
+
+    return { type: 'parameter', name }
+  }
 }
 
 function isLiteral(s: string): boolean {
@@ -73,6 +91,10 @@ function isLiteral(s: string): boolean {
       return true
   }
   return false
+}
+
+function isParameter(s: string): boolean {
+  return s === '['
 }
 
 function isGroupOpen(s: string): boolean {

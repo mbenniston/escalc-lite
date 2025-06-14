@@ -7,6 +7,69 @@ import {
   Tokenizer,
 } from '../src/tokenizer'
 import type { LogicalExpression } from '../src/logical-expression'
+import type { Token } from '../src/token'
+
+test('evaluate with complex expression', () => {
+  const ast = parse(
+    '(((([a]+([b]*([c]-[d]/([e]+[f]))))-(([g]+[h])*([i]-([j]/([k]+[l]-[m])))))+([n]*([o]+[p]-([q]*[r]/([s]+[t])))))/((([u]+[v])*([w]-[x]+([y]/([z]+[aa]))))+([ab]-[ac]+([ad]/([ae]+[af]-[ag])))))+(([ah]*([ai]+[aj]-([ak]/([al]+[am]))))-(([an]+[ao])/([ap]-[aq]+[ar]))+[as])',
+  )
+
+  expect(
+    evaluate(ast, {
+      ['a']: 2,
+      ['b']: 3,
+      ['c']: 14,
+      ['d']: 6,
+      ['e']: 1,
+      ['f']: 1,
+      ['g']: 5,
+      ['h']: 2,
+      ['i']: 20,
+      ['j']: 8,
+      ['k']: 1,
+      ['l']: 2,
+      ['m']: 1,
+      ['n']: 4,
+      ['o']: 7,
+      ['p']: 5,
+      ['q']: 2,
+      ['r']: 6,
+      ['s']: 1,
+      ['t']: 1,
+      ['u']: 5,
+      ['v']: 5,
+      ['w']: 30,
+      ['x']: 10,
+      ['y']: 6,
+      ['z']: 2,
+      ['aa']: 1,
+      ['ab']: 40,
+      ['ac']: 10,
+      ['ad']: 18,
+      ['ae']: 2,
+      ['af']: 1,
+      ['ag']: 1,
+      ['ah']: 3,
+      ['ai']: 9,
+      ['aj']: 6,
+      ['ak']: 10,
+      ['al']: 2,
+      ['am']: 3,
+      ['an']: 7,
+      ['ao']: 3,
+      ['ap']: 10,
+      ['aq']: 2,
+      ['ar']: 2,
+      ['as']: 5,
+    }),
+  ).toBeCloseTo(41.5, 5)
+})
+
+test('evaluate with parameters', () => {
+  const ast = parse('1 + 2 + [my parameter]')
+
+  expect(evaluate(ast, { ['my parameter']: 10 })).toBe(13)
+})
 
 test('evaluate after parse', () => {
   const ast = parse('12 + (4                        * 8 /2)')
@@ -20,8 +83,8 @@ test('parse', () => {
   expect(ast).toStrictEqual({
     type: 'binary',
     operator: 'addition',
-    left: { type: 'value', value: 12 },
-    right: { type: 'value', value: 4 },
+    left: { type: 'value', value: { type: 'constant', value: 12 } },
+    right: { type: 'value', value: { type: 'constant', value: 4 } },
   } satisfies LogicalExpression)
 })
 
@@ -42,7 +105,9 @@ test('buffer', () => {
 
 test('tokenizer', () => {
   const scanner = new Tokenizer(
-    new BufferedIterator(new CharacterIterator('12 + 22 * 2 / 4')),
+    new BufferedIterator(
+      new CharacterIterator('12 + 22 * 2 / 4 + [my parameter]'),
+    ),
   )
   const tokens = []
 
@@ -60,7 +125,9 @@ test('tokenizer', () => {
     { type: 'literal', value: '2' },
     { type: 'operator', operator: '/' },
     { type: 'literal', value: '4' },
-  ])
+    { type: 'operator', operator: '+' },
+    { type: 'parameter', name: 'my parameter' },
+  ] satisfies Token[])
 })
 
 test('evaluate', () => {
@@ -72,10 +139,10 @@ const testAst: LogicalExpression = {
   operator: 'addition',
   left: {
     type: 'value',
-    value: 1,
+    value: { type: 'constant', value: 1 },
   },
   right: {
     type: 'value',
-    value: 2,
+    value: { type: 'constant', value: 2 },
   },
 }
