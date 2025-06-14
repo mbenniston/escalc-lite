@@ -1,5 +1,8 @@
 export type Token =
-  | { type: 'literal'; value: string }
+  | {
+      type: 'literal'
+      value: { type: 'boolean' | 'string' | 'number'; value: string }
+    }
   | { type: 'identifier'; identifier: string }
   | {
       type: 'operator'

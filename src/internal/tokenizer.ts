@@ -9,8 +9,8 @@ export class Tokenizer implements Iterator<Token> {
 
     if (nextCharacter === null) return null
 
-    if (isLiteral(nextCharacter)) {
-      return this.literal()
+    if (isNumber(nextCharacter)) {
+      return this.number()
     } else if (isOperator(nextCharacter)) {
       return this.operator()
     } else if (isGroupOpen(nextCharacter)) {
@@ -36,15 +36,18 @@ export class Tokenizer implements Iterator<Token> {
     }
   }
 
-  private literal(): Token {
+  private number(): Token {
     let completeLiteral = ''
     while (true) {
       const nextCharacter = this.source.peek
-      if (nextCharacter === null || !isLiteral(nextCharacter)) break
+      if (nextCharacter === null || !isNumber(nextCharacter)) break
       completeLiteral += nextCharacter
       this.source.next()
     }
-    return { type: 'literal', value: completeLiteral }
+    return {
+      type: 'literal',
+      value: { type: 'number', value: completeLiteral },
+    }
   }
 
   private operator(): Token {
@@ -96,7 +99,7 @@ export class Tokenizer implements Iterator<Token> {
   }
 }
 
-function isLiteral(s: string): boolean {
+function isNumber(s: string): boolean {
   switch (s) {
     case '0':
     case '1':

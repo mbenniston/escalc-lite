@@ -1,17 +1,22 @@
 import { Opcode, type Program } from './compiler'
+import type { ValueCalculator } from './value-calculator'
+
 type ExpressionFunction = (
-  args: number[],
-  globalParameters?: Record<string, number>,
-  expressionFunctions?: Record<string, ExpressionFunction>,
-) => number
+  args: unknown[],
+  globalParameters: Record<string, unknown>,
+  expressionFunctions: Record<string, ExpressionFunction>,
+  calculator: ValueCalculator,
+) => unknown
+
 export function execute(
   program: Program,
-  expressionArguments?: Record<string, number>,
-  expressionFunctions?: Record<string, ExpressionFunction>,
-): number {
-  const stack: number[] = new Array<number>()
+  expressionArguments: Record<string, unknown>,
+  expressionFunctions: Record<string, ExpressionFunction>,
+  calculator: ValueCalculator,
+): unknown {
+  const stack: unknown[] = new Array<unknown>()
 
-  function push(d: number) {
+  function push(d: unknown) {
     stack.push(d)
   }
 
@@ -27,28 +32,28 @@ export function execute(
         {
           const right = pop()
           const left = pop()
-          push(left + right)
+          push(calculator.add(left, right))
         }
         break
       case Opcode.SUB:
         {
           const right = pop()
           const left = pop()
-          push(left - right)
+          push(calculator.sub(left, right))
         }
         break
       case Opcode.MUL:
         {
           const right = pop()
           const left = pop()
-          push(left * right)
+          push(calculator.mul(left, right))
         }
         break
       case Opcode.DIV:
         {
           const right = pop()
           const left = pop()
-          push(left / right)
+          push(calculator.div(left, right))
         }
         break
       case Opcode.RETURN:
@@ -72,18 +77,18 @@ export function execute(
         {
           if (expressionFunctions && instruction.name in expressionFunctions) {
             const f = expressionFunctions[instruction.name]
-            const args: number[] = []
+            const args: unknown[] = []
             for (let i = 0; i < instruction.arity; i++) {
               args.push(pop())
             }
-            push(f(args, expressionArguments, expressionFunctions))
+            push(f(args, expressionArguments, expressionFunctions, calculator))
           } else if (instruction.name in builtIns) {
             const f = builtIns[instruction.name]
-            const args: number[] = []
+            const args: unknown[] = []
             for (let i = 0; i < instruction.arity; i++) {
               args.push(pop())
             }
-            push(f(args, expressionArguments, expressionFunctions))
+            push(f(args, expressionArguments, expressionFunctions, calculator))
           } else {
             throw new Error('function not found')
           }
@@ -96,5 +101,5 @@ export function execute(
 }
 
 const builtIns: Record<string, ExpressionFunction> = {
-  Sin: (args) => Math.sin(args[0]),
+  Sin: (args) => (typeof args[0] === 'number' ? Math.sin(args[0]) : 0),
 }

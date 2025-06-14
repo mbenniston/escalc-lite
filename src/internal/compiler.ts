@@ -29,7 +29,7 @@ export type Instruction =
     }
   | {
       opcode: Opcode.LOAD_CONSTANT
-      constant: number
+      constant: unknown
     }
   | {
       opcode: Opcode.LOAD_PARAMETER

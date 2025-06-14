@@ -16,6 +16,6 @@ export type LogicalExpression =
   | {
       type: 'value'
       value:
-        | { type: 'constant'; value: number }
+        | { type: 'constant'; value: unknown }
         | { type: 'parameter'; name: string }
     }

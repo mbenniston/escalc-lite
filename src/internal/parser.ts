@@ -1,23 +1,33 @@
 import { BufferedIterator, CharacterIterator, Tokenizer } from './tokenizer'
+import type { LiteralFactory } from './literal-factory'
 import type { LogicalExpression } from './logical-expression'
 import type { Token } from './token'
 
 export type Scanner = BufferedIterator<Token>
 
-export function parse(expression: string): LogicalExpression {
+export function parse(
+  expression: string,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   const scanner = new BufferedIterator(
     new Tokenizer(new BufferedIterator(new CharacterIterator(expression))),
   )
 
-  return logicalExpression(scanner)
+  return logicalExpression(scanner, literalFactory)
 }
 
-function logicalExpression(scanner: Scanner): LogicalExpression {
-  return additive(scanner)
+function logicalExpression(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
+  return additive(scanner, literalFactory)
 }
 
-function additive(scanner: Scanner): LogicalExpression {
-  let left = factor(scanner)
+function additive(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
+  let left = factor(scanner, literalFactory)
 
   while (true) {
     let matchedType: null | 'subtraction' | 'addition' = null
@@ -29,7 +39,7 @@ function additive(scanner: Scanner): LogicalExpression {
     switch (matchedType) {
       case 'subtraction':
       case 'addition': {
-        const right = factor(scanner)
+        const right = factor(scanner, literalFactory)
         left = { type: 'binary', operator: matchedType, left, right }
         break
       }
@@ -39,8 +49,11 @@ function additive(scanner: Scanner): LogicalExpression {
   }
 }
 
-function factor(scanner: Scanner): LogicalExpression {
-  let left = value(scanner)
+function factor(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
+  let left = value(scanner, literalFactory)
 
   while (true) {
     let matchedType: null | 'multiplication' | 'division' = null
@@ -52,7 +65,7 @@ function factor(scanner: Scanner): LogicalExpression {
     switch (matchedType) {
       case 'multiplication':
       case 'division': {
-        const right = value(scanner)
+        const right = value(scanner, literalFactory)
         left = { type: 'binary', operator: matchedType, left, right }
         break
       }
@@ -80,12 +93,18 @@ function matchOperator(
   return nextToken
 }
 
-function value(scanner: Scanner): LogicalExpression {
+function value(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   const nextToken = scanner.next()
   if (nextToken?.type === 'literal') {
     return {
       type: 'value',
-      value: { type: 'constant', value: Number(nextToken.value) },
+      value: {
+        type: 'constant',
+        value: literalFactory.create(nextToken.value),
+      },
     }
   }
 
@@ -102,7 +121,7 @@ function value(scanner: Scanner): LogicalExpression {
 
     if (scanner.peek?.type !== 'group-close') {
       while (true) {
-        args.push(logicalExpression(scanner))
+        args.push(logicalExpression(scanner, literalFactory))
 
         if (scanner.peek?.type !== 'comma') break
         scanner.next()
@@ -117,7 +136,7 @@ function value(scanner: Scanner): LogicalExpression {
   }
 
   if (nextToken?.type === 'group-open') {
-    const expression = logicalExpression(scanner)
+    const expression = logicalExpression(scanner, literalFactory)
 
     const closeGroup = scanner.next()
     if (closeGroup?.type !== 'group-close') {
