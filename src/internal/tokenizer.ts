@@ -69,13 +69,27 @@ export class Tokenizer implements Iterator<Token> {
     }
     let contents = ''
 
+    let withinEscape = false
+
     while (true) {
       const nextCharacter = this.source.peek
       if (nextCharacter === null) {
         throw new Error('Expected end of string')
       }
-      if (nextCharacter === stringStartChar) break
-      contents += nextCharacter
+      if (nextCharacter === stringStartChar && !withinEscape) break
+      if (
+        withinEscape &&
+        nextCharacter !== stringStartChar &&
+        nextCharacter !== '\\'
+      ) {
+        throw new Error('Expected end of escaped character')
+      }
+      if (!withinEscape && nextCharacter === '\\') {
+        withinEscape = true
+      } else {
+        contents += nextCharacter
+        withinEscape = false
+      }
       this.source.next()
     }
 
