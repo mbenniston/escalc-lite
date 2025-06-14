@@ -10,11 +10,16 @@ export class DefaultLiteralFactory implements LiteralFactory {
   create(value: Literal): unknown {
     switch (value.type) {
       case 'number':
-        return Number(value)
-      case 'boolean':
-        return Boolean(value)
+        return Number(value.value)
+      case 'boolean': {
+        if (value.value === 'false') return false
+        if (value.value === 'true') return false
+        throw new Error('invalid boolean value')
+      }
       case 'string':
-        return value
+        return value.value
+      case 'date':
+        return new Date(value.value)
     }
   }
 }

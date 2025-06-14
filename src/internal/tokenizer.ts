@@ -11,6 +11,10 @@ export class Tokenizer implements Iterator<Token> {
 
     if (isNumber(nextCharacter)) {
       return this.number()
+    } else if (isStringStart(nextCharacter)) {
+      return this.string()
+    } else if (isDateStart(nextCharacter)) {
+      return this.date()
     } else if (isOperator(nextCharacter)) {
       return this.operator()
     } else if (isGroupOpen(nextCharacter)) {
@@ -34,6 +38,52 @@ export class Tokenizer implements Iterator<Token> {
       if (nextCharacter === null || !isWhitespace(nextCharacter)) return
       this.source.next()
     }
+  }
+
+  private date(): Token {
+    let completeLiteral = ''
+    this.source.next()
+    while (true) {
+      const nextCharacter = this.source.peek
+      if (nextCharacter === null) {
+        throw new Error('Expected end of date')
+      }
+      if (nextCharacter === '#') break
+      completeLiteral += nextCharacter
+      this.source.next()
+    }
+
+    if (this.source.next() !== '#') {
+      throw new Error('not a date end')
+    }
+    return {
+      type: 'literal',
+      value: { type: 'date', value: completeLiteral },
+    }
+  }
+
+  private string(): Token {
+    const stringStartChar = this.source.next()
+    if (stringStartChar !== "'" && stringStartChar !== '"') {
+      throw new Error('not a string start')
+    }
+    let contents = ''
+
+    while (true) {
+      const nextCharacter = this.source.peek
+      if (nextCharacter === null) {
+        throw new Error('Expected end of string')
+      }
+      if (nextCharacter === stringStartChar) break
+      contents += nextCharacter
+      this.source.next()
+    }
+
+    if (this.source.next() !== stringStartChar) {
+      throw new Error('not a string end')
+    }
+
+    return { type: 'literal', value: { type: 'string', value: contents } }
   }
 
   private number(): Token {
@@ -79,6 +129,11 @@ export class Tokenizer implements Iterator<Token> {
       this.source.next()
       nextCharacter = this.source.peek
     }
+
+    if (identifier === 'false' || identifier === 'true') {
+      return { type: 'literal', value: { type: 'boolean', value: identifier } }
+    }
+
     return { type: 'identifier', identifier }
   }
 
@@ -118,6 +173,14 @@ function isNumber(s: string): boolean {
 
 function isParameter(s: string): boolean {
   return s === '['
+}
+
+function isStringStart(s: string): boolean {
+  return s === "'" || s === '"'
+}
+
+function isDateStart(s: string): boolean {
+  return s === '#'
 }
 
 function isGroupOpen(s: string): boolean {

@@ -1,7 +1,7 @@
 export type Token =
   | {
       type: 'literal'
-      value: { type: 'boolean' | 'string' | 'number'; value: string }
+      value: { type: 'boolean' | 'string' | 'number' | 'date'; value: string }
     }
   | { type: 'identifier'; identifier: string }
   | {

@@ -20,9 +20,11 @@ export class Expression {
     public readonly expression: string,
     options: { literalFactory?: LiteralFactory } = {},
   ) {
-    this._program = compile(
-      parse(expression, options.literalFactory ?? new DefaultLiteralFactory()),
+    const ast = parse(
+      expression,
+      options.literalFactory ?? new DefaultLiteralFactory(),
     )
+    this._program = compile(ast)
   }
 
   Evaluate(): unknown {
