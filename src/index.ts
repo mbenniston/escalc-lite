@@ -1,12 +1,13 @@
+import Decimal from 'decimal.js'
 import type { LogicalExpression } from './logical-expression'
 
 export function evaluate(
   logicalExpression: LogicalExpression,
   expressionArguments?: Record<string, number>,
-): number {
+): Decimal {
   switch (logicalExpression.type) {
     case 'unary':
-      return -evaluate(logicalExpression.expression, expressionArguments)
+      return evaluate(logicalExpression.expression, expressionArguments).neg()
     case 'ternary': {
       const leftValue = evaluate(logicalExpression.left, expressionArguments)
       return leftValue
@@ -14,33 +15,24 @@ export function evaluate(
         : evaluate(logicalExpression.right, expressionArguments)
     }
     case 'binary': {
+      const left = evaluate(logicalExpression.left, expressionArguments)
+      const right = evaluate(logicalExpression.right, expressionArguments)
+
       switch (logicalExpression.operator) {
         case 'subtraction':
-          return (
-            evaluate(logicalExpression.left, expressionArguments) -
-            evaluate(logicalExpression.right, expressionArguments)
-          )
+          return left.sub(right)
         case 'addition':
-          return (
-            evaluate(logicalExpression.left, expressionArguments) +
-            evaluate(logicalExpression.right, expressionArguments)
-          )
+          return left.add(right)
         case 'multiplication':
-          return (
-            evaluate(logicalExpression.left, expressionArguments) *
-            evaluate(logicalExpression.right, expressionArguments)
-          )
+          return left.mul(right)
         case 'division':
-          return (
-            evaluate(logicalExpression.left, expressionArguments) /
-            evaluate(logicalExpression.right, expressionArguments)
-          )
+          return left.div(right)
       }
     }
     case 'value':
       switch (logicalExpression.value.type) {
         case 'constant':
-          return logicalExpression.value.value
+          return new Decimal(logicalExpression.value.value)
         case 'parameter':
           {
             if (
@@ -52,7 +44,7 @@ export function evaluate(
               )
             }
           }
-          return expressionArguments[logicalExpression.value.name]
+          return new Decimal(expressionArguments[logicalExpression.value.name])
       }
   }
 }
