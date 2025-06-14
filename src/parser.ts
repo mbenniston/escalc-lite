@@ -96,6 +96,26 @@ function value(scanner: Scanner): LogicalExpression {
     }
   }
 
+  if (nextToken?.type === 'identifier') {
+    scanner.next()
+    const args: LogicalExpression[] = []
+
+    if (scanner.peek?.type !== 'group-close') {
+      while (true) {
+        args.push(logicalExpression(scanner))
+
+        if (scanner.peek?.type !== 'comma') break
+        scanner.next()
+      }
+    }
+
+    if (scanner.next()?.type !== 'group-close') {
+      throw new Error('Expected group-close')
+    }
+
+    return { type: 'function', name: nextToken.identifier, arguments: args }
+  }
+
   if (nextToken?.type === 'group-open') {
     const expression = logicalExpression(scanner)
 

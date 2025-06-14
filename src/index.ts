@@ -1,9 +1,14 @@
 import Decimal from 'decimal.js'
 import type { LogicalExpression } from './logical-expression'
-
+type ExpressionFunction = (
+  args: LogicalExpression[],
+  globalParameters?: Record<string, number>,
+  expressionFunctions?: Record<string, ExpressionFunction>,
+) => Decimal
 export function evaluate(
   logicalExpression: LogicalExpression,
   expressionArguments?: Record<string, number>,
+  expressionFunctions?: Record<string, ExpressionFunction>,
 ): Decimal {
   switch (logicalExpression.type) {
     case 'unary':
@@ -29,6 +34,26 @@ export function evaluate(
           return left.div(right)
       }
     }
+    case 'function': {
+      if (
+        expressionFunctions &&
+        logicalExpression.name in expressionFunctions
+      ) {
+        return expressionFunctions[logicalExpression.name](
+          logicalExpression.arguments,
+          expressionArguments,
+          expressionFunctions,
+        )
+      }
+      if (logicalExpression.name in builtIns) {
+        return builtIns[logicalExpression.name](
+          logicalExpression.arguments,
+          expressionArguments,
+          expressionFunctions,
+        )
+      }
+      throw new Error(`Function ${logicalExpression.name} not supported`)
+    }
     case 'value':
       switch (logicalExpression.value.type) {
         case 'constant':
@@ -47,4 +72,9 @@ export function evaluate(
           return new Decimal(expressionArguments[logicalExpression.value.name])
       }
   }
+}
+
+const builtIns: Record<string, ExpressionFunction> = {
+  Sin: (args, globalParameters, functions) =>
+    evaluate(args[0], globalParameters, functions).sin(),
 }

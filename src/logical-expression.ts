@@ -12,6 +12,7 @@ export type LogicalExpression =
       right: LogicalExpression
     }
   | { type: 'unary'; expression: LogicalExpression }
+  | { type: 'function'; name: string; arguments: LogicalExpression[] }
   | {
       type: 'value'
       value:

@@ -19,6 +19,10 @@ export class Tokenizer implements Iterator<Token> {
       return this.groupClose()
     } else if (isParameter(nextCharacter)) {
       return this.parameter()
+    } else if (isComma(nextCharacter)) {
+      return this.comma()
+    } else if (isIdentifierStart(nextCharacter)) {
+      return this.identifier()
     } else {
       throw new Error(`unrecognised input '${nextCharacter}'`)
     }
@@ -57,6 +61,22 @@ export class Tokenizer implements Iterator<Token> {
   private groupClose(): Token {
     this.source.next()
     return { type: 'group-close' }
+  }
+
+  private comma(): Token {
+    this.source.next()
+    return { type: 'comma' }
+  }
+
+  private identifier(): Token {
+    let identifier = ''
+    let nextCharacter = this.source.peek
+    while (nextCharacter !== null && isIdentifier(nextCharacter)) {
+      identifier += nextCharacter
+      this.source.next()
+      nextCharacter = this.source.peek
+    }
+    return { type: 'identifier', identifier }
   }
 
   private parameter(): Token {
@@ -103,6 +123,18 @@ function isGroupOpen(s: string): boolean {
 
 function isGroupClose(s: string): boolean {
   return s === ')'
+}
+
+function isComma(s: string): boolean {
+  return s === ','
+}
+
+function isIdentifierStart(s: string): boolean {
+  return s >= 'A' && s <= 'z'
+}
+
+function isIdentifier(s: string): boolean {
+  return (s >= 'A' && s <= 'z') || (s >= '0' && s <= '9')
 }
 
 function isOperator(s: string): boolean {

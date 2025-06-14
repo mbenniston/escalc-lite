@@ -66,9 +66,9 @@ test('evaluate with complex expression', () => {
 })
 
 test('evaluate with parameters', () => {
-  const ast = parse('1 + 2 + [my parameter]')
+  const ast = parse('1 + 2 + [my parameter] + Sin(0)')
 
-  expect(evaluate(ast, { ['my parameter']: 10 })).toBe(13)
+  expect(evaluate(ast, { ['my parameter']: 10 }).toNumber()).toBe(13)
 })
 
 test('evaluate after parse', () => {
@@ -78,13 +78,20 @@ test('evaluate after parse', () => {
 })
 
 test('parse', () => {
-  const ast = parse('12 + 4')
+  const ast = parse('12 + Sin()')
 
   expect(ast).toStrictEqual({
     type: 'binary',
     operator: 'addition',
     left: { type: 'value', value: { type: 'constant', value: 12 } },
-    right: { type: 'value', value: { type: 'constant', value: 4 } },
+    right: {
+      type: 'function',
+      name: 'Sin',
+      arguments: [
+        { type: 'value', value: { type: 'constant', value: 4 } },
+        { type: 'value', value: { type: 'constant', value: 2 } },
+      ],
+    },
   } satisfies LogicalExpression)
 })
 
@@ -106,7 +113,7 @@ test('buffer', () => {
 test('tokenizer', () => {
   const scanner = new Tokenizer(
     new BufferedIterator(
-      new CharacterIterator('12 + 22 * 2 / 4 + [my parameter]'),
+      new CharacterIterator('12 + 22 * 2 / 4 + Sin([my parameter],)'),
     ),
   )
   const tokens = []
@@ -126,7 +133,11 @@ test('tokenizer', () => {
     { type: 'operator', operator: '/' },
     { type: 'literal', value: '4' },
     { type: 'operator', operator: '+' },
+    { type: 'identifier', identifier: 'Sin' },
+    { type: 'group-open' },
     { type: 'parameter', name: 'my parameter' },
+    { type: 'comma' },
+    { type: 'group-close' },
   ] satisfies Token[])
 })
 
