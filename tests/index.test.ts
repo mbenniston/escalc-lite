@@ -1,13 +1,12 @@
 import { expect, test } from 'vitest'
-import { evaluate } from '../src'
-import { parse } from '../src/parser'
+import { evaluate, parse } from '../src'
 import {
   BufferedIterator,
   CharacterIterator,
   Tokenizer,
-} from '../src/tokenizer'
-import type { LogicalExpression } from '../src/logical-expression'
-import type { Token } from '../src/token'
+} from '../src/internal/tokenizer'
+import type { LogicalExpression } from '../src/internal/logical-expression'
+import type { Token } from '../src/internal/token'
 
 test('evaluate with complex expression', () => {
   const ast = parse(
