@@ -9,11 +9,15 @@ export function parse(expression: string): LogicalExpression {
     new Tokenizer(new BufferedIterator(new CharacterIterator(expression))),
   )
 
+  return logicalExpression(scanner)
+}
+
+function logicalExpression(scanner: Scanner): LogicalExpression {
   return additive(scanner)
 }
 
 function additive(scanner: Scanner): LogicalExpression {
-  const left = factor(scanner)
+  let left = factor(scanner)
 
   while (true) {
     let matchedType: null | 'subtraction' | 'addition' = null
@@ -26,7 +30,8 @@ function additive(scanner: Scanner): LogicalExpression {
       case 'subtraction':
       case 'addition': {
         const right = factor(scanner)
-        return { type: 'binary', operator: matchedType, left, right }
+        left = { type: 'binary', operator: matchedType, left, right }
+        break
       }
       case null:
         return left
@@ -35,7 +40,7 @@ function additive(scanner: Scanner): LogicalExpression {
 }
 
 function factor(scanner: Scanner): LogicalExpression {
-  const left = value(scanner)
+  let left = value(scanner)
 
   while (true) {
     let matchedType: null | 'multiplication' | 'division' = null
@@ -48,7 +53,8 @@ function factor(scanner: Scanner): LogicalExpression {
       case 'multiplication':
       case 'division': {
         const right = value(scanner)
-        return { type: 'binary', operator: matchedType, left, right }
+        left = { type: 'binary', operator: matchedType, left, right }
+        break
       }
       case null:
         return left
@@ -74,13 +80,22 @@ function matchOperator(
   return nextToken
 }
 
-function value(
-  scanner: Scanner,
-): Extract<LogicalExpression, { type: 'value' }> {
+function value(scanner: Scanner): LogicalExpression {
   const nextToken = scanner.next()
-  if (nextToken?.type !== 'literal') {
-    throw new Error('Expected value')
+  if (nextToken?.type === 'literal') {
+    return { type: 'value', value: Number(nextToken.value) }
   }
 
-  return { type: 'value', value: Number(nextToken.value) }
+  if (nextToken?.type === 'group-open') {
+    const expression = logicalExpression(scanner)
+
+    const closeGroup = scanner.next()
+    if (closeGroup?.type !== 'group-close') {
+      throw new Error(`Expected group-close got ${JSON.stringify(closeGroup)}`)
+    }
+
+    return expression
+  }
+
+  throw new Error('Expected value')
 }

@@ -9,9 +9,9 @@ import {
 import type { LogicalExpression } from '../src/logical-expression'
 
 test('evaluate after parse', () => {
-  const ast = parse('12 + 4')
+  const ast = parse('12 + (4                        * 8 /2)')
 
-  expect(evaluate(ast)).toBe(16)
+  expect(evaluate(ast)).toBe(28)
 })
 
 test('parse', () => {

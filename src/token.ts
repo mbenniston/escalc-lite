@@ -4,3 +4,5 @@ export type Token =
       type: 'operator'
       operator: string
     }
+  | { type: 'group-open' }
+  | { type: 'group-close' }

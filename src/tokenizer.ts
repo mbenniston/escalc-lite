@@ -13,6 +13,10 @@ export class Tokenizer implements Iterator<Token> {
       return this.literal()
     } else if (isOperator(nextCharacter)) {
       return this.operator()
+    } else if (isGroupOpen(nextCharacter)) {
+      return this.groupOpen()
+    } else if (isGroupClose(nextCharacter)) {
+      return this.groupClose()
     } else {
       throw new Error(`unrecognised input '${nextCharacter}'`)
     }
@@ -42,6 +46,16 @@ export class Tokenizer implements Iterator<Token> {
     if (operator === null) throw new Error(`unrecognised input '${operator}'`)
     return { type: 'operator', operator }
   }
+
+  private groupOpen(): Token {
+    this.source.next()
+    return { type: 'group-open' }
+  }
+
+  private groupClose(): Token {
+    this.source.next()
+    return { type: 'group-close' }
+  }
 }
 
 function isLiteral(s: string): boolean {
@@ -59,6 +73,14 @@ function isLiteral(s: string): boolean {
       return true
   }
   return false
+}
+
+function isGroupOpen(s: string): boolean {
+  return s === '('
+}
+
+function isGroupClose(s: string): boolean {
+  return s === ')'
 }
 
 function isOperator(s: string): boolean {
