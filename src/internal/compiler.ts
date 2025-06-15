@@ -7,6 +7,22 @@ export enum Opcode {
   SUB,
   MUL,
   DIV,
+  MORE_THAN,
+  LESS_THAN,
+  MORE_THAN_EQUAL,
+  LESS_THAN_EQUAL,
+  NOT_EQUALS,
+  EQUALS,
+  AND,
+  OR,
+  BIT_AND,
+  BIT_XOR,
+  BIT_OR,
+  BIT_LEFT_SHIFT,
+  BIT_RIGHT_SHIFT,
+  NOT,
+  BIT_COMPLEMENT,
+  NEGATE,
   CALL,
   RETURN,
 }
@@ -23,6 +39,54 @@ export type Instruction =
     }
   | {
       opcode: Opcode.DIV
+    }
+  | {
+      opcode: Opcode.MORE_THAN
+    }
+  | {
+      opcode: Opcode.LESS_THAN
+    }
+  | {
+      opcode: Opcode.MORE_THAN_EQUAL
+    }
+  | {
+      opcode: Opcode.LESS_THAN_EQUAL
+    }
+  | {
+      opcode: Opcode.AND
+    }
+  | {
+      opcode: Opcode.OR
+    }
+  | {
+      opcode: Opcode.NOT
+    }
+  | {
+      opcode: Opcode.NOT_EQUALS
+    }
+  | {
+      opcode: Opcode.EQUALS
+    }
+  | {
+      opcode: Opcode.BIT_AND
+    }
+  | {
+      opcode: Opcode.BIT_XOR
+    }
+  | {
+      opcode: Opcode.BIT_OR
+    }
+  | {
+      opcode: Opcode.BIT_LEFT_SHIFT
+    }
+  | {
+      opcode: Opcode.BIT_RIGHT_SHIFT
+    }
+  | {
+      opcode: Opcode.BIT_COMPLEMENT
+    }
+  | {
+      opcode: Opcode.NEGATE
     }
   | {
       opcode: Opcode.RETURN
@@ -58,6 +122,20 @@ export function generate(
 ): void {
   switch (logicalExpression.type) {
     case 'unary':
+      {
+        generate(logicalExpression.expression, program)
+        switch (logicalExpression.operator) {
+          case 'not':
+            program.instructions.push({ opcode: Opcode.NOT })
+            break
+          case 'bit-complement':
+            program.instructions.push({ opcode: Opcode.BIT_COMPLEMENT })
+            break
+          case 'negate':
+            program.instructions.push({ opcode: Opcode.NEGATE })
+            break
+        }
+      }
       break
     case 'ternary':
       break
@@ -77,6 +155,45 @@ export function generate(
             break
           case 'division':
             program.instructions.push({ opcode: Opcode.DIV })
+            break
+          case 'more-than':
+            program.instructions.push({ opcode: Opcode.MORE_THAN })
+            break
+          case 'less-than':
+            program.instructions.push({ opcode: Opcode.LESS_THAN })
+            break
+          case 'more-than-equal':
+            program.instructions.push({ opcode: Opcode.MORE_THAN_EQUAL })
+            break
+          case 'less-than-equal':
+            program.instructions.push({ opcode: Opcode.LESS_THAN_EQUAL })
+            break
+          case 'not-equals':
+            program.instructions.push({ opcode: Opcode.NOT_EQUALS })
+            break
+          case 'equals':
+            program.instructions.push({ opcode: Opcode.EQUALS })
+            break
+          case 'and':
+            program.instructions.push({ opcode: Opcode.AND })
+            break
+          case 'or':
+            program.instructions.push({ opcode: Opcode.OR })
+            break
+          case 'bit-and':
+            program.instructions.push({ opcode: Opcode.BIT_AND })
+            break
+          case 'bit-or':
+            program.instructions.push({ opcode: Opcode.BIT_OR })
+            break
+          case 'bit-xor':
+            program.instructions.push({ opcode: Opcode.BIT_XOR })
+            break
+          case 'bit-left-shift':
+            program.instructions.push({ opcode: Opcode.BIT_LEFT_SHIFT })
+            break
+          case 'bit-right-shift':
+            program.instructions.push({ opcode: Opcode.BIT_RIGHT_SHIFT })
             break
         }
       }

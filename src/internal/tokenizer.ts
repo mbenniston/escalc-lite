@@ -15,7 +15,7 @@ export class Tokenizer implements Iterator<Token> {
       return this.string()
     } else if (isDateStart(nextCharacter)) {
       return this.date()
-    } else if (isOperator(nextCharacter)) {
+    } else if (isOperatorStart(nextCharacter)) {
       return this.operator()
     } else if (isGroupOpen(nextCharacter)) {
       return this.groupOpen()
@@ -117,6 +117,22 @@ export class Tokenizer implements Iterator<Token> {
   private operator(): Token {
     const operator = this.source.next()
     if (operator === null) throw new Error(`unrecognised input '${operator}'`)
+
+    const nextCharacter = this.source.peek
+    if (
+      (operator === '>' && nextCharacter === '=') ||
+      (operator === '<' && nextCharacter === '=') ||
+      (operator === '=' && nextCharacter === '=') ||
+      (operator === '!' && nextCharacter === '=') ||
+      (operator === '&' && nextCharacter === '&') ||
+      (operator === '>' && nextCharacter === '>') ||
+      (operator === '<' && nextCharacter === '<') ||
+      (operator === '|' && nextCharacter === '|')
+    ) {
+      this.source.next()
+      return { type: 'operator', operator: operator + nextCharacter }
+    }
+
     return { type: 'operator', operator }
   }
 
@@ -217,12 +233,20 @@ function isIdentifier(s: string): boolean {
   return (s >= 'A' && s <= 'z') || (s >= '0' && s <= '9')
 }
 
-function isOperator(s: string): boolean {
+function isOperatorStart(s: string): boolean {
   switch (s) {
     case '*':
     case '+':
     case '/':
     case '-':
+    case '>':
+    case '<':
+    case '=':
+    case '!':
+    case '^':
+    case '~':
+    case '|':
+    case '&':
       return true
   }
   return false

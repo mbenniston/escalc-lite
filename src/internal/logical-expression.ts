@@ -7,11 +7,32 @@ export type LogicalExpression =
     }
   | {
       type: 'binary'
-      operator: 'subtraction' | 'addition' | 'multiplication' | 'division'
+      operator:
+        | 'subtraction'
+        | 'addition'
+        | 'multiplication'
+        | 'division'
+        | 'more-than'
+        | 'less-than'
+        | 'more-than-equal'
+        | 'less-than-equal'
+        | 'not-equals'
+        | 'equals'
+        | 'and'
+        | 'or'
+        | 'bit-and'
+        | 'bit-or'
+        | 'bit-xor'
+        | 'bit-left-shift'
+        | 'bit-right-shift'
       left: LogicalExpression
       right: LogicalExpression
     }
-  | { type: 'unary'; expression: LogicalExpression }
+  | {
+      type: 'unary'
+      operator: 'not' | 'bit-complement' | 'negate'
+      expression: LogicalExpression
+    }
   | { type: 'function'; name: string; arguments: LogicalExpression[] }
   | {
       type: 'value'
