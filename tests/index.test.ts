@@ -13,7 +13,8 @@ test('test escape ', () => {
 })
 
 test('test builtins ', () => {
-  const e = new Expression('1')
+  const e = new Expression('{1}')
+  e.Parameters['1'] = 1
   expect(e.Evaluate()).toStrictEqual(1)
 })
 

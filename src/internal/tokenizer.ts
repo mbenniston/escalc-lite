@@ -231,17 +231,21 @@ export class Tokenizer implements Iterator<Token> {
   }
 
   private parameter(): Token {
-    this.source.next()
+    const openToken = this.source.next()
+
+    let closeToken = ']'
+    if (openToken === '{') closeToken = '}'
 
     let name = ''
     let nextCharacter = this.source.peek
-    while (nextCharacter !== ']' && nextCharacter !== null) {
+    while (nextCharacter !== closeToken && nextCharacter !== null) {
       name += nextCharacter
       this.source.next()
       nextCharacter = this.source.peek
     }
 
-    if (this.source.next() !== ']') throw new Error('Expected ]')
+    if (this.source.next() !== closeToken)
+      throw new Error(`Expected ${closeToken}`)
 
     return { type: 'parameter', name }
   }
@@ -283,7 +287,7 @@ function isNumber(s: string): boolean {
 }
 
 function isParameter(s: string): boolean {
-  return s === '['
+  return s === '[' || s === '{'
 }
 
 function isStringStart(s: string): boolean {
