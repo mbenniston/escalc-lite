@@ -25,6 +25,8 @@ export type LogicalExpression =
         | 'bit-xor'
         | 'bit-left-shift'
         | 'bit-right-shift'
+        | 'in'
+        | 'not-in'
       left: LogicalExpression
       right: LogicalExpression
     }

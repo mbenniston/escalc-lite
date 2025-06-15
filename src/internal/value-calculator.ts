@@ -12,6 +12,8 @@ export abstract class ValueCalculator {
     right: ExpressionParameter,
   ): unknown
   abstract add(left: ExpressionParameter, right: ExpressionParameter): unknown
+  abstract in(left: ExpressionParameter, right: ExpressionParameter): unknown
+  abstract notIn(left: ExpressionParameter, right: ExpressionParameter): unknown
   abstract sub(left: ExpressionParameter, right: ExpressionParameter): unknown
   abstract div(left: ExpressionParameter, right: ExpressionParameter): unknown
   abstract mul(left: ExpressionParameter, right: ExpressionParameter): unknown
@@ -64,6 +66,34 @@ export abstract class ValueCalculator {
 }
 
 export class DefaultValueCalculator implements ValueCalculator {
+  in(left: ExpressionParameter, right: ExpressionParameter): unknown {
+    const leftValue = left.evaluate()
+    const rightValue = right.evaluate()
+
+    if (typeof leftValue === 'string' && typeof rightValue === 'string') {
+      return rightValue.includes(leftValue)
+    }
+
+    if (!Array.isArray(rightValue)) {
+      throw new TypeError('expected array')
+    }
+
+    return rightValue.includes(leftValue)
+  }
+  notIn(left: ExpressionParameter, right: ExpressionParameter): unknown {
+    const leftValue = left.evaluate()
+    const rightValue = right.evaluate()
+
+    if (typeof leftValue === 'string' && typeof rightValue === 'string') {
+      return !rightValue.includes(leftValue)
+    }
+
+    if (!Array.isArray(rightValue)) {
+      throw new TypeError('expected array')
+    }
+
+    return !rightValue.includes(leftValue)
+  }
   moreThan(left: ExpressionParameter, right: ExpressionParameter): unknown {
     const leftValue = left.evaluate()
     const rightValue = right.evaluate()

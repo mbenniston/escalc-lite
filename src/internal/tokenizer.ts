@@ -182,6 +182,18 @@ export class Tokenizer implements Iterator<Token> {
       return { type: 'literal', value: { type: 'boolean', value: identifier } }
     }
 
+    if (identifier === 'not' || identifier === 'in') {
+      return { type: 'operator', operator: identifier }
+    }
+
+    if (identifier === 'or') {
+      return { type: 'operator', operator: '||' }
+    }
+
+    if (identifier === 'and') {
+      return { type: 'operator', operator: '&&' }
+    }
+
     return { type: 'identifier', identifier }
   }
 

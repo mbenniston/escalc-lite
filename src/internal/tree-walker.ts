@@ -61,6 +61,10 @@ export function execute(
       }
 
       switch (expression.operator) {
+        case 'in':
+          return options.calculator.in(leftParam, rightParam)
+        case 'not-in':
+          return options.calculator.notIn(leftParam, rightParam)
         case 'subtraction':
           return options.calculator.sub(leftParam, rightParam)
         case 'addition':
@@ -88,6 +92,7 @@ export function execute(
         case 'bit-and':
           return options.calculator.bitAnd(leftParam, rightParam)
         case 'bit-or':
+          console.log(options.calculator.bitOr(leftParam, rightParam))
           return options.calculator.bitOr(leftParam, rightParam)
         case 'bit-xor':
           return options.calculator.bitXor(leftParam, rightParam)
@@ -98,33 +103,39 @@ export function execute(
       }
       break
     }
-    case 'unary': {
-      const param: ExpressionParameter = {
-        evaluate: () => execute(expression.expression, options),
-        expression: expression.expression,
+    case 'unary':
+      {
+        const param: ExpressionParameter = {
+          evaluate: () => execute(expression.expression, options),
+          expression: expression.expression,
+        }
+        switch (expression.operator) {
+          case 'not':
+            return options.calculator.not(param)
+          case 'bit-complement':
+            return options.calculator.bitComplement(param)
+          case 'negate':
+            return options.calculator.negate(param)
+        }
       }
-      switch (expression.operator) {
-        case 'not':
-          return options.calculator.not(param)
-        case 'bit-complement':
-          return options.calculator.bitComplement(param)
-        case 'negate':
-          return options.calculator.negate(param)
-      }
-    }
+      break
     case 'function': {
       const args = expression.arguments.map((arg) => ({
         expression: arg,
         evaluate: () => execute(arg, options),
       }))
+
       if (expression.name in options.expressionFunctions) {
         return options.expressionFunctions[expression.name](args, options)
       }
       if (expression.name in builtIns) {
         return builtIns[expression.name](args, options)
       }
+      break
     }
   }
+
+  throw new Error('unhandled expression')
 }
 
 export const builtIns: Record<string, ExpressionFunction> = {
@@ -138,7 +149,10 @@ export const builtIns: Record<string, ExpressionFunction> = {
   Floor: (args) => Math.floor(asNumber(args[0])),
   IEEERemainder: (args) => ieeeRemainder(asNumber(args[0]), asNumber(args[1])),
   Ln: (args) => Math.log(asNumber(args[0])),
-  Log: (args) => Math.log(asNumber(args[0])) / Math.log(asNumber(args[1])),
+  Log: (args) => {
+    if (args.length === 1) return Math.log(asNumber(args[0]))
+    return Math.log(asNumber(args[0])) / Math.log(asNumber(args[1]))
+  },
   Log10: (args) => Math.log10(asNumber(args[0])),
   Max: (args) => Math.max(asNumber(args[0]), asNumber(args[1])),
   Min: (args) => Math.min(asNumber(args[0]), asNumber(args[1])),
@@ -187,7 +201,11 @@ export const builtIns: Record<string, ExpressionFunction> = {
   },
 }
 
-function asNumber(param: ExpressionParameter): number {
+function asNumber(param?: ExpressionParameter): number {
+  if (param === undefined) {
+    throw new TypeError(`Expected number got nothing`)
+  }
+
   const value = param.evaluate()
   if (typeof value !== 'number') {
     throw new TypeError(`Expected number, got ${typeof value}`)

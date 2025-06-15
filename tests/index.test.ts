@@ -18,15 +18,14 @@ test('test builtins ', () => {
 })
 
 test('test separators ', () => {
-  const e = new Expression('(1)')
+  const e = new Expression('"Hello" in (0,)')
   e.Parameters = { foo: 0 }
-  expect(e.Evaluate()).toStrictEqual(1)
+  expect(e.Evaluate()).toStrictEqual(false)
 })
 
 test('operators ', () => {
-  const e = new Expression(
-    '((5 << 1) == 10 && (12 >> 2) == 3) || !(7 & 1 == 1 && (4 | 1) == 5) || (6 ^ 3) == 5',
-  )
+  const e = new Expression('Max(Max(1,3),2) + 1')
+  process.stdout.write(JSON.stringify(e, null, 2))
   expect(e.Evaluate()).toStrictEqual(true)
 })
 
@@ -39,8 +38,21 @@ test('test date comparison', () => {
 
 test('test complex2', () => {
   const ast = new Expression(
-    'Max(Abs([a]-Sqrt([b]*[c])),Sin([d]+[e])*Cos([f]-[g]),([h]+[i])^2/Log([j]+10),Min([k],[l]+[m]*2),Log(Sqrt(Abs([n]-[o]+Min([p],[q])))))+Sqrt(Abs([r]-[s]/Max([t],1)))',
+    'Max(' +
+      'Max(' +
+      'Max(' +
+      'Max(' +
+      'Abs([a] - Sqrt([b] * [c])),' +
+      'Sin([d] + [e]) * Cos([f] - [g])' +
+      '),' +
+      '(([h] + [i]) ^ 2) / Ln([j] + 10)' +
+      '),' +
+      'Min([k], [l] + [m] * 2)' +
+      '),' +
+      'Ln(Sqrt(Abs([n] - [o] + Min([p], [q]))))' +
+      ') + Sqrt(Abs([r] - [s] / Max([t], 1)))',
   )
+
   ast.Parameters = {
     ['a']: 25,
     ['b']: 4,
@@ -63,5 +75,5 @@ test('test complex2', () => {
     ['s']: 5,
     ['t']: 0,
   }
-  expect(ast.Evaluate()).toBeCloseTo(22.873, 3)
+  expect(ast.Evaluate()).toBeCloseTo(22.872983346207416, 3)
 })

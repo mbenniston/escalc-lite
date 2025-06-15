@@ -23,7 +23,10 @@ function logicalExpression(
   return ternary(scanner, literalFactory)
 }
 
-function ternary(scanner: Scanner, literalFactory: LiteralFactory) {
+function ternary(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   let left = or(scanner, literalFactory)
 
   while (true) {
@@ -45,7 +48,10 @@ function ternary(scanner: Scanner, literalFactory: LiteralFactory) {
   }
 }
 
-function or(scanner: Scanner, literalFactory: LiteralFactory) {
+function or(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   let left = and(scanner, literalFactory)
 
   const operators = ['||']
@@ -68,7 +74,10 @@ function or(scanner: Scanner, literalFactory: LiteralFactory) {
     }
   }
 }
-function and(scanner: Scanner, literalFactory: LiteralFactory) {
+function and(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   let left = comparison(scanner, literalFactory)
 
   const operators = ['&&']
@@ -92,7 +101,10 @@ function and(scanner: Scanner, literalFactory: LiteralFactory) {
   }
 }
 
-function comparison(scanner: Scanner, literalFactory: LiteralFactory) {
+function comparison(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   let left = bitOr(scanner, literalFactory)
 
   const operators = ['>', '<', '<=', '>=', '!=', '==', '<>']
@@ -110,6 +122,23 @@ function comparison(scanner: Scanner, literalFactory: LiteralFactory) {
   } as const
 
   while (true) {
+    let scannerPeek = scanner.peek
+    if (scannerPeek?.type === 'operator' && scannerPeek.operator === 'not') {
+      scanner.next()
+      scannerPeek = scanner.peek
+      if (scannerPeek?.type !== 'operator' || scannerPeek.operator !== 'in') {
+        throw new Error('expect in after not in comparison')
+      }
+      scanner.next()
+      const items = bitOr(scanner, literalFactory)
+      return { type: 'binary', operator: 'not-in', left, right: items }
+    }
+    if (scannerPeek?.type === 'operator' && scannerPeek.operator === 'in') {
+      scanner.next()
+      const items = bitOr(scanner, literalFactory)
+      return { type: 'binary', operator: 'in', left, right: items }
+    }
+
     const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
@@ -122,7 +151,10 @@ function comparison(scanner: Scanner, literalFactory: LiteralFactory) {
   }
 }
 
-function bitOr(scanner: Scanner, literalFactory: LiteralFactory) {
+function bitOr(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   let left = bitXor(scanner, literalFactory)
 
   const operators = ['|']
@@ -146,7 +178,10 @@ function bitOr(scanner: Scanner, literalFactory: LiteralFactory) {
   }
 }
 
-function bitXor(scanner: Scanner, literalFactory: LiteralFactory) {
+function bitXor(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   let left = bitAnd(scanner, literalFactory)
 
   const operators = ['^']
@@ -170,7 +205,10 @@ function bitXor(scanner: Scanner, literalFactory: LiteralFactory) {
   }
 }
 
-function bitAnd(scanner: Scanner, literalFactory: LiteralFactory) {
+function bitAnd(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   let left = bitShift(scanner, literalFactory)
 
   const operators = ['&']
@@ -194,7 +232,10 @@ function bitAnd(scanner: Scanner, literalFactory: LiteralFactory) {
   }
 }
 
-function bitShift(scanner: Scanner, literalFactory: LiteralFactory) {
+function bitShift(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
   let left = additive(scanner, literalFactory)
 
   const operators = ['>>', '<<']
@@ -279,10 +320,6 @@ function unary(
   scanner: Scanner,
   literalFactory: LiteralFactory,
 ): LogicalExpression {
-  const operatorToken = matchOperators(scanner, ['~', '!', '-'])
-
-  const v = value(scanner, literalFactory)
-
   const operatorMap: Record<
     string,
     Extract<LogicalExpression, { type: 'unary' }>['operator']
@@ -290,11 +327,24 @@ function unary(
     '!': 'not',
     '~': 'bit-complement',
     '-': 'negate',
+    not: 'not',
   } as const
 
-  if (operatorToken !== null && operatorToken.operator in operatorMap) {
-    const operator = operatorMap[operatorToken.operator]
-    return { type: 'unary', operator, expression: v }
+  const operators: (typeof operatorMap)['string'][] = []
+
+  while (true) {
+    const operatorToken = matchOperators(scanner, ['~', '!', '-', 'not'])
+
+    if (operatorToken !== null && operatorToken.operator in operatorMap) {
+      operators.push(operatorMap[operatorToken.operator])
+    } else {
+      break
+    }
+  }
+
+  let v = value(scanner, literalFactory)
+  for (const operator of operators) {
+    v = { type: 'unary', operator, expression: v }
   }
 
   return v
@@ -364,6 +414,10 @@ function value(
 
     peekTokenType = scanner.peek?.type
     if (peekTokenType !== 'separator') {
+      if (peekTokenType !== 'group-close') {
+        throw new Error('expected group close')
+      }
+      scanner.next()
       return expression
     }
 
