@@ -1,10 +1,5 @@
 import { expect, test } from 'vitest'
 import { Expression } from '../src'
-import {
-  BufferedIterator,
-  CharacterIterator,
-  Tokenizer,
-} from '../src/internal/tokenizer'
 
 test('test ', () => {
   const e = new Expression('#12/11/2003#')
@@ -18,23 +13,12 @@ test('test escape ', () => {
 })
 
 test('test builtins ', () => {
-  const e = new Expression(' 5 ? 3 : 1')
-  expect(e.Evaluate()).toStrictEqual(3)
+  const e = new Expression(' 1 + 2 * 3 > 6 && 4 | 2 ^ 1 == 7 ? 100 : 200')
+  expect(e.Evaluate()).toStrictEqual(100)
 })
 
 test('test separators ', () => {
-  const tokenizer = new Tokenizer(
-    new BufferedIterator<string>(
-      new CharacterIterator('ifs([foo] > 50, "bar", foo > 75, "baz", "quux")'),
-    ),
-  )
-  const tokens = []
-  let token
-  while ((token = tokenizer.next())) {
-    tokens.push(token)
-  }
-  console.log(tokens)
-  const e = new Expression('ifs([foo] > 50, "bar", [foo] > 75, "baz", "quux")')
+  const e = new Expression('ifs(foo > 50, "bar", foo > 75, "baz", "quux")')
   e.Parameters = { foo: 0 }
   expect(e.Evaluate()).toStrictEqual('quux')
 })

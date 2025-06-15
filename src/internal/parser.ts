@@ -323,10 +323,20 @@ function value(
   }
 
   if (nextToken?.type === 'identifier') {
-    scanner.next()
     const args: LogicalExpression[] = []
 
-    if (scanner.peek?.type !== 'group-close') {
+    let peekTokenType: Token['type'] | undefined = scanner.peek?.type
+    if (peekTokenType !== 'group-open') {
+      return {
+        type: 'value',
+        value: { type: 'parameter', name: nextToken.identifier },
+      }
+    }
+
+    scanner.next()
+
+    peekTokenType = scanner.peek?.type
+    if (peekTokenType !== 'group-close') {
       while (true) {
         args.push(logicalExpression(scanner, literalFactory))
 
