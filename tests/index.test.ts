@@ -25,7 +25,6 @@ test('test separators ', () => {
 
 test('operators ', () => {
   const e = new Expression('Max(Max(1,3),2) + 1')
-  process.stdout.write(JSON.stringify(e, null, 2))
   expect(e.Evaluate()).toStrictEqual(true)
 })
 

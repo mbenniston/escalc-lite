@@ -92,7 +92,6 @@ export function execute(
         case 'bit-and':
           return options.calculator.bitAnd(leftParam, rightParam)
         case 'bit-or':
-          console.log(options.calculator.bitOr(leftParam, rightParam))
           return options.calculator.bitOr(leftParam, rightParam)
         case 'bit-xor':
           return options.calculator.bitXor(leftParam, rightParam)
