@@ -211,19 +211,24 @@ export class Tokenizer implements Iterator<Token> {
       nextCharacter = this.source.peek
     }
 
-    if (identifier === 'false' || identifier === 'true') {
-      return { type: 'literal', value: { type: 'boolean', value: identifier } }
+    const lowerIdentifier = identifier.toLowerCase()
+
+    if (lowerIdentifier === 'false' || lowerIdentifier === 'true') {
+      return {
+        type: 'literal',
+        value: { type: 'boolean', value: lowerIdentifier },
+      }
     }
 
-    if (identifier === 'not' || identifier === 'in') {
-      return { type: 'operator', operator: identifier }
+    if (lowerIdentifier === 'not' || lowerIdentifier === 'in') {
+      return { type: 'operator', operator: lowerIdentifier }
     }
 
-    if (identifier === 'or') {
+    if (lowerIdentifier === 'or') {
       return { type: 'operator', operator: '||' }
     }
 
-    if (identifier === 'and') {
+    if (lowerIdentifier === 'and') {
       return { type: 'operator', operator: '&&' }
     }
 

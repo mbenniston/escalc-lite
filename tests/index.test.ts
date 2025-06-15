@@ -13,9 +13,9 @@ test('test escape ', () => {
 })
 
 test('test builtins ', () => {
-  const e = new Expression('{1}')
-  e.Parameters['1'] = 1
-  expect(e.Evaluate()).toStrictEqual(1)
+  const e = new Expression('1  In {1}')
+  e.Parameters['1'] = [1, 2, 3]
+  expect(e.Evaluate()).toStrictEqual(true)
 })
 
 test('test separators ', () => {
