@@ -39,11 +39,11 @@ class DecimalCalculator extends DefaultValueCalculator {
     return super.mul(left, right)
   }
 
-  neg(left: unknown): unknown {
+  negate(left: unknown): unknown {
     if (left instanceof Decimal) {
       return left.neg()
     }
-    return super.neg(left)
+    return super.negate(left)
   }
 
   sub(left: unknown, right: unknown): unknown {
