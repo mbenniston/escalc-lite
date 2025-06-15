@@ -39,6 +39,7 @@
     "@sxzz/prettier-config": "^2.2.1",
     "@types/node": "^22.15.17",
     "bumpp": "^10.1.0",
+    "decimal.js": "^10.5.0",
     "eslint": "^9.26.0",
     "happy-dom": "^17.4.7",
     "ncalcjs": "^2.1.1",
@@ -46,10 +47,7 @@
     "tsdown": "^0.11.9",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.3",
-    "decimal.js": "^10.5.0"
+    "vitest": "^3.1.3"
   },
-  "prettier": "@sxzz/prettier-config",
-  "dependencies": {
-  }
+  "prettier": "@sxzz/prettier-config"
 }

@@ -8,7 +8,6 @@ test('test ', () => {
 
 test('test escape ', () => {
   const es = String.raw`"hello\\ worlds"`
-  console.log(es)
   const e = new Expression(es)
   expect(e.Evaluate()).toStrictEqual(String.raw`hello\ worlds`)
 })
