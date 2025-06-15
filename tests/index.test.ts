@@ -12,6 +12,17 @@ test('test escape ', () => {
   expect(e.Evaluate()).toStrictEqual(`hello\\ \t \r worlds`)
 })
 
+test('test parameter collect ', () => {
+  const e = new Expression(
+    '{1} + {2} ? MyFunction([3]) : -AnotherFunction([4]) + ![5]',
+  )
+  expect([...e.RequiredParameters]).toStrictEqual(['1', '2', '3', '4', '5'])
+  expect([...e.RequiredFunctions]).toStrictEqual([
+    'MyFunction',
+    'AnotherFunction',
+  ])
+})
+
 test('test builtins ', () => {
   const e = new Expression('1  In {1}')
   e.Parameters['1'] = [1, 2, 3]

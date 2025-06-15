@@ -1,3 +1,4 @@
+import { collectParameters } from '../internal/collect-parameters'
 import {
   DefaultLiteralFactory,
   type LiteralFactory,
@@ -19,11 +20,13 @@ export class Expression {
   public static readonly BuiltIns = builtIns
   private readonly _logicalExpression: LogicalExpression
   public Parameters: Record<string, unknown> = {}
-  public EvaluateFunctions: Record<
+  public Functions: Record<
     string,
     (args: ExpressionParameter[], options: EvaluationOptions) => unknown
   > = {}
   public Calculator: ValueCalculator = new DefaultValueCalculator()
+  private _requiredParameters: ReturnType<typeof collectParameters> | null =
+    null
 
   constructor(
     public readonly expression: string,
@@ -38,8 +41,22 @@ export class Expression {
   Evaluate(): unknown {
     return execute(this._logicalExpression, {
       expressionArguments: this.Parameters,
-      expressionFunctions: this.EvaluateFunctions,
+      expressionFunctions: this.Functions,
       calculator: this.Calculator,
     })
+  }
+
+  get RequiredParameters() {
+    if (this._requiredParameters) return this._requiredParameters.parameters
+    return (this._requiredParameters = collectParameters(
+      this._logicalExpression,
+    )).parameters
+  }
+
+  get RequiredFunctions() {
+    if (this._requiredParameters) return this._requiredParameters.functions
+    return (this._requiredParameters = collectParameters(
+      this._logicalExpression,
+    )).functions
   }
 }

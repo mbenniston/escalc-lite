@@ -76,7 +76,7 @@ test('custom decimal with builtin overrides', () => {
     literalFactory: new DecimalLiteralFactory(),
   })
   expression.Calculator = new DecimalCalculator()
-  expression.EvaluateFunctions.Sin = (args, options) => {
+  expression.Functions.Sin = (args, options) => {
     const arg = args[0].evaluate()
     if (arg instanceof Decimal) {
       return arg.sin()
