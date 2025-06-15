@@ -1,17 +1,17 @@
-import { compile, type Program } from '../internal/compiler'
 import {
   DefaultLiteralFactory,
   type LiteralFactory,
 } from '../internal/literal-factory'
 import { parse } from '../internal/parser'
-import { execute } from '../internal/stack-machine'
+import { execute } from '../internal/tree-walker'
 import {
   DefaultValueCalculator,
   type ValueCalculator,
 } from '../internal/value-calculator'
+import type { LogicalExpression } from '../internal/logical-expression'
 
 export class Expression {
-  private readonly _program: Program
+  private readonly _logicalExpression: LogicalExpression
   public Parameters: Record<string, unknown> = {}
   public EvaluateFunctions: Record<string, (args: unknown) => unknown> = {}
   public Calculator: ValueCalculator = new DefaultValueCalculator()
@@ -20,19 +20,17 @@ export class Expression {
     public readonly expression: string,
     options: { literalFactory?: LiteralFactory } = {},
   ) {
-    const ast = parse(
+    this._logicalExpression = parse(
       expression,
       options.literalFactory ?? new DefaultLiteralFactory(),
     )
-    this._program = compile(ast)
   }
 
   Evaluate(): unknown {
-    return execute(
-      this._program,
-      this.Parameters,
-      this.EvaluateFunctions,
-      this.Calculator,
-    )
+    return execute(this._logicalExpression, {
+      expressionArguments: this.Parameters,
+      expressionFunctions: this.EvaluateFunctions,
+      calculator: this.Calculator,
+    })
   }
 }
