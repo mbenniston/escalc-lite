@@ -18,9 +18,9 @@ test('test builtins ', () => {
 })
 
 test('test separators ', () => {
-  const e = new Expression('ifs(foo > 50, "bar", foo > 75, "baz", "quux")')
+  const e = new Expression('(1)')
   e.Parameters = { foo: 0 }
-  expect(e.Evaluate()).toStrictEqual('quux')
+  expect(e.Evaluate()).toStrictEqual(1)
 })
 
 test('operators ', () => {

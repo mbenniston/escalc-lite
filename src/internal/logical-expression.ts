@@ -39,4 +39,5 @@ export type LogicalExpression =
       value:
         | { type: 'constant'; value: unknown }
         | { type: 'parameter'; name: string }
+        | { type: 'list'; items: LogicalExpression[] }
     }

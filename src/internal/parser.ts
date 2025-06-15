@@ -354,14 +354,39 @@ function value(
   }
 
   if (nextToken?.type === 'group-open') {
-    const expression = logicalExpression(scanner, literalFactory)
-
-    const closeGroup = scanner.next()
-    if (closeGroup?.type !== 'group-close') {
-      throw new Error(`Expected group-close got ${JSON.stringify(closeGroup)}`)
+    let peekTokenType: Token['type'] | undefined = scanner.peek?.type
+    if (peekTokenType === 'group-close') {
+      scanner.next()
+      return { type: 'value', value: { type: 'list', items: [] } }
     }
 
-    return expression
+    const expression = logicalExpression(scanner, literalFactory)
+
+    peekTokenType = scanner.peek?.type
+    if (peekTokenType !== 'separator') {
+      return expression
+    }
+
+    scanner.next()
+
+    const items: LogicalExpression[] = [expression]
+
+    peekTokenType = scanner.peek?.type
+    if (peekTokenType !== 'group-close') {
+      while (true) {
+        items.push(logicalExpression(scanner, literalFactory))
+
+        if (scanner.peek?.type !== 'separator') break
+        scanner.next()
+      }
+    }
+
+    const groupCloseToken = scanner.next()?.type
+    if (groupCloseToken !== 'group-close') {
+      throw new Error(`Expected group-close got ${groupCloseToken}`)
+    }
+
+    return { type: 'value', value: { type: 'list', items } }
   }
 
   throw new Error('Expected value')

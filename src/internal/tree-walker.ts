@@ -19,6 +19,8 @@ export function execute(
   switch (expression.type) {
     case 'value': {
       switch (expression.value.type) {
+        case 'list':
+          return expression.value.items.map((item) => execute(item, options))
         case 'constant':
           return expression.value.value
         case 'parameter': {
@@ -27,6 +29,7 @@ export function execute(
           return options.expressionArguments[expression.value.name]
         }
       }
+      break
     }
     case 'ternary':
       {
