@@ -1,5 +1,5 @@
 import type { LogicalExpression } from './logical-expression'
-import type { ValueCalculator } from './value-calculator'
+import type { ExpressionParameter, ValueCalculator } from './value-calculator'
 
 type EvaluationOptions = {
   expressionArguments: Record<string, unknown>
@@ -8,207 +8,151 @@ type EvaluationOptions = {
 }
 
 type ExpressionFunction = (
-  args: unknown[],
+  args: ExpressionParameter[],
   options: EvaluationOptions,
 ) => unknown
 
 export function execute(
-  logicalExpression: LogicalExpression,
+  expression: LogicalExpression,
   options: EvaluationOptions,
 ): unknown {
-  switch (logicalExpression.type) {
+  switch (expression.type) {
     case 'value': {
-      switch (logicalExpression.value.type) {
+      switch (expression.value.type) {
         case 'constant':
-          return logicalExpression.value.value
+          return expression.value.value
         case 'parameter': {
-          if (!(logicalExpression.value.name in options.expressionArguments))
+          if (!(expression.value.name in options.expressionArguments))
             throw new Error('no arguments')
-          return options.expressionArguments[logicalExpression.value.name]
+          return options.expressionArguments[expression.value.name]
         }
       }
     }
     case 'ternary':
       break
     case 'binary': {
-      switch (logicalExpression.operator) {
+      const leftParam: ExpressionParameter = {
+        evaluate: () => execute(expression.left, options),
+        expression: expression.left,
+      }
+
+      const rightParam: ExpressionParameter = {
+        evaluate: () => execute(expression.right, options),
+        expression: expression.right,
+      }
+
+      switch (expression.operator) {
         case 'subtraction':
-          return options.calculator.sub(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.sub(leftParam, rightParam)
         case 'addition':
-          return options.calculator.add(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.add(leftParam, rightParam)
         case 'multiplication':
-          return options.calculator.mul(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.mul(leftParam, rightParam)
         case 'division':
-          return options.calculator.div(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.div(leftParam, rightParam)
         case 'more-than':
-          return options.calculator.moreThan(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.moreThan(leftParam, rightParam)
         case 'less-than':
-          return options.calculator.lessThan(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.lessThan(leftParam, rightParam)
         case 'more-than-equal':
-          return options.calculator.moreThanEqual(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.moreThanEqual(leftParam, rightParam)
         case 'less-than-equal':
-          return options.calculator.lessThanEqual(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.lessThanEqual(leftParam, rightParam)
         case 'not-equals':
-          return options.calculator.notEquals(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.notEquals(leftParam, rightParam)
         case 'equals':
-          return options.calculator.equals(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.equals(leftParam, rightParam)
         case 'and':
-          return options.calculator.and(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.and(leftParam, rightParam)
         case 'or':
-          return options.calculator.or(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.or(leftParam, rightParam)
         case 'bit-and':
-          return options.calculator.bitAnd(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.bitAnd(leftParam, rightParam)
         case 'bit-or':
-          return options.calculator.bitOr(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.bitOr(leftParam, rightParam)
         case 'bit-xor':
-          return options.calculator.bitXor(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.bitXor(leftParam, rightParam)
         case 'bit-left-shift':
-          return options.calculator.bitLeftShift(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.bitLeftShift(leftParam, rightParam)
         case 'bit-right-shift':
-          return options.calculator.bitRightShift(
-            execute(logicalExpression.left, options),
-            execute(logicalExpression.right, options),
-          )
+          return options.calculator.bitRightShift(leftParam, rightParam)
       }
       break
     }
     case 'unary': {
-      switch (logicalExpression.operator) {
+      const param: ExpressionParameter = {
+        evaluate: () => execute(expression.expression, options),
+        expression: expression.expression,
+      }
+      switch (expression.operator) {
         case 'not':
-          return options.calculator.not(
-            execute(logicalExpression.expression, options),
-          )
+          return options.calculator.not(param)
         case 'bit-complement':
-          return options.calculator.bitComplement(
-            execute(logicalExpression.expression, options),
-          )
+          return options.calculator.bitComplement(param)
         case 'negate':
-          return options.calculator.negate(
-            execute(logicalExpression.expression, options),
-          )
+          return options.calculator.negate(param)
       }
     }
     case 'function': {
-      const args = logicalExpression.arguments.map((arg) =>
-        execute(arg, options),
-      )
-      if (logicalExpression.name in builtIns) {
-        return builtIns[logicalExpression.name](args, options)
+      const args = expression.arguments.map((arg) => ({
+        expression: arg,
+        evaluate: () => execute(arg, options),
+      }))
+
+      if (expression.name in builtIns) {
+        return builtIns[expression.name](args, options)
       }
-      if (logicalExpression.name in options.expressionFunctions) {
-        return options.expressionFunctions[logicalExpression.name](
-          args,
-          options,
-        )
+      if (expression.name in options.expressionFunctions) {
+        return options.expressionFunctions[expression.name](args, options)
       }
     }
   }
 }
 
 const builtIns: Record<string, ExpressionFunction> = {
-  Abs: (args) => (typeof args[0] === 'number' ? Math.abs(args[0]) : 0),
-  Acos: (args) => (typeof args[0] === 'number' ? Math.acos(args[0]) : 0),
-  Asin: (args) => (typeof args[0] === 'number' ? Math.asin(args[0]) : 0),
-  Atan: (args) => (typeof args[0] === 'number' ? Math.atan(args[0]) : 0),
-  Ceiling: (args) => (typeof args[0] === 'number' ? Math.ceil(args[0]) : 0),
-  Cos: (args) => (typeof args[0] === 'number' ? Math.cos(args[0]) : 0),
-  Exp: (args) => (typeof args[0] === 'number' ? Math.exp(args[0]) : 0),
-  Floor: (args) => (typeof args[0] === 'number' ? Math.floor(args[0]) : 0),
-  IEEERemainder: (args) => {
-    if (
-      args.length < 2 ||
-      typeof args[0] !== 'number' ||
-      typeof args[1] !== 'number'
-    )
-      return 0
-    return args[0] - Math.round(args[0] / args[1]) * args[1]
-  },
-  Ln: (args) => (typeof args[0] === 'number' ? Math.log(args[0]) : 0),
-  Log: (args) => {
-    if (
-      args.length < 2 ||
-      typeof args[0] !== 'number' ||
-      typeof args[1] !== 'number'
-    )
-      return 0
-    return Math.log(args[0]) / Math.log(args[1])
-  },
-  Log10: (args) => (typeof args[0] === 'number' ? Math.log10(args[0]) : 0),
-  Max: (args) => (args.length < 2 ? 0 : Math.max(...(args as number[]))),
-  Min: (args) => (args.length < 2 ? 0 : Math.min(...(args as number[]))),
-  Pow: (args) => {
-    if (
-      args.length < 2 ||
-      typeof args[0] !== 'number' ||
-      typeof args[1] !== 'number'
-    )
-      return 0
-    return args[0] ** args[1]
-  },
-  Round: (args) => {
-    if (args.length === 0 || typeof args[0] !== 'number') return 0
-    const value = args[0]
-    const digits = typeof args[1] === 'number' ? args[1] : 0
-    const factor = 10 ** digits
-    return Math.round(value * factor) / factor
-  },
-  Sign: (args) => {
-    if (typeof args[0] !== 'number') return 0
-    return Math.sign(args[0])
-  },
-  Sin: (args) => (typeof args[0] === 'number' ? Math.sin(args[0]) : 0),
-  Sqrt: (args) => (typeof args[0] === 'number' ? Math.sqrt(args[0]) : 0),
-  Tan: (args) => (typeof args[0] === 'number' ? Math.tan(args[0]) : 0),
-  Truncate: (args) => {
-    if (typeof args[0] !== 'number') return 0
-    return args[0] < 0 ? Math.ceil(args[0]) : Math.floor(args[0])
-  },
+  Abs: (args) => Math.abs(asNumber(args[0])),
+  Acos: (args) => Math.acos(asNumber(args[0])),
+  Asin: (args) => Math.asin(asNumber(args[0])),
+  Atan: (args) => Math.atan(asNumber(args[0])),
+  Ceiling: (args) => Math.ceil(asNumber(args[0])),
+  Cos: (args) => Math.cos(asNumber(args[0])),
+  Exp: (args) => Math.exp(asNumber(args[0])),
+  Floor: (args) => Math.floor(asNumber(args[0])),
+  IEEERemainder: (args) => ieeeRemainder(asNumber(args[0]), asNumber(args[1])),
+  Ln: (args) => Math.log(asNumber(args[0])),
+  Log: (args) => Math.log(asNumber(args[0])) / Math.log(asNumber(args[1])),
+  Log10: (args) => Math.log10(asNumber(args[0])),
+  Max: (args) => Math.max(asNumber(args[0]), asNumber(args[1])),
+  Min: (args) => Math.min(asNumber(args[0]), asNumber(args[1])),
+  Pow: (args) => asNumber(args[0]) ** asNumber(args[1]),
+  Round: (args) =>
+    args.length === 2
+      ? roundTo(asNumber(args[0]), asNumber(args[1]))
+      : Math.round(asNumber(args[0])),
+  Sign: (args) => Math.sign(asNumber(args[0])),
+  Sin: (args) => Math.sin(asNumber(args[0])),
+  Sqrt: (args) => Math.sqrt(asNumber(args[0])),
+  Tan: (args) => Math.tan(asNumber(args[0])),
+  Truncate: (args) => truncate(asNumber(args[0])),
+}
+
+function asNumber(param: ExpressionParameter): number {
+  const value = param.evaluate()
+  if (typeof value !== 'number') {
+    throw new TypeError(`Expected number, got ${typeof value}`)
+  }
+  return value
+}
+
+function ieeeRemainder(x: number, y: number): number {
+  return x - y * Math.round(x / y)
+}
+
+function roundTo(value: number, decimals: number): number {
+  const factor = 10 ** decimals
+  return Math.round(value * factor) / factor
+}
+
+function truncate(value: number): number {
+  return value < 0 ? Math.ceil(value) : Math.floor(value)
 }

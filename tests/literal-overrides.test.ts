@@ -6,7 +6,10 @@ import {
   type Literal,
 } from '../src/internal/literal-factory'
 
-import { DefaultValueCalculator } from '../src/internal/value-calculator'
+import {
+  DefaultValueCalculator,
+  type ExpressionParameter,
+} from '../src/internal/value-calculator'
 
 class DecimalLiteralFactory extends DefaultLiteralFactory {
   create(value: Literal): unknown {
@@ -18,37 +21,51 @@ class DecimalLiteralFactory extends DefaultLiteralFactory {
 }
 
 class DecimalCalculator extends DefaultValueCalculator {
-  add(left: unknown, right: unknown): unknown {
-    if (left instanceof Decimal && right instanceof Decimal) {
-      return left.add(right)
+  add(left: ExpressionParameter, right: ExpressionParameter): unknown {
+    const leftValue = left.evaluate()
+    const rightValue = right.evaluate()
+
+    if (leftValue instanceof Decimal && rightValue instanceof Decimal) {
+      return leftValue.add(rightValue)
     }
     return super.add(left, right)
   }
 
-  div(left: unknown, right: unknown): unknown {
-    if (left instanceof Decimal && right instanceof Decimal) {
-      return left.div(right)
+  div(left: ExpressionParameter, right: ExpressionParameter): unknown {
+    const leftValue = left.evaluate()
+    const rightValue = right.evaluate()
+
+    if (leftValue instanceof Decimal && rightValue instanceof Decimal) {
+      return leftValue.div(rightValue)
     }
     return super.div(left, right)
   }
 
-  mul(left: unknown, right: unknown): unknown {
-    if (left instanceof Decimal && right instanceof Decimal) {
-      return left.mul(right)
+  mul(left: ExpressionParameter, right: ExpressionParameter): unknown {
+    const leftValue = left.evaluate()
+    const rightValue = right.evaluate()
+
+    if (leftValue instanceof Decimal && rightValue instanceof Decimal) {
+      return leftValue.mul(rightValue)
     }
     return super.mul(left, right)
   }
 
-  negate(left: unknown): unknown {
-    if (left instanceof Decimal) {
-      return left.neg()
+  negate(left: ExpressionParameter): unknown {
+    const leftValue = left.evaluate()
+
+    if (leftValue instanceof Decimal) {
+      return leftValue.neg()
     }
     return super.negate(left)
   }
 
-  sub(left: unknown, right: unknown): unknown {
-    if (left instanceof Decimal && right instanceof Decimal) {
-      return left.sub(right)
+  sub(left: ExpressionParameter, right: ExpressionParameter): unknown {
+    const leftValue = left.evaluate()
+    const rightValue = right.evaluate()
+
+    if (leftValue instanceof Decimal && rightValue instanceof Decimal) {
+      return leftValue.sub(rightValue)
     }
     return super.sub(left, right)
   }
