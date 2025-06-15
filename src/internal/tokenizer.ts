@@ -87,11 +87,21 @@ export class Tokenizer implements Iterator<Token> {
       if (
         withinEscape &&
         nextCharacter !== stringStartChar &&
-        nextCharacter !== '\\'
+        !['\\', 't', 'r'].includes(nextCharacter)
       ) {
         throw new Error('Expected end of escaped character')
       }
-      if (!withinEscape && nextCharacter === '\\') {
+
+      if (withinEscape && nextCharacter === 'n') {
+        contents += '\n'
+        withinEscape = false
+      } else if (withinEscape && nextCharacter === 't') {
+        contents += '\t'
+        withinEscape = false
+      } else if (withinEscape && nextCharacter === 'r') {
+        contents += '\r'
+        withinEscape = false
+      } else if (!withinEscape && nextCharacter === '\\') {
         withinEscape = true
       } else {
         contents += nextCharacter

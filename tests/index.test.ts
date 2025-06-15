@@ -7,9 +7,9 @@ test('test ', () => {
 })
 
 test('test escape ', () => {
-  const es = String.raw`"hello\\ worlds"`
+  const es = `"hello\\\\ \\t \\r worlds"`
   const e = new Expression(es)
-  expect(e.Evaluate()).toStrictEqual(String.raw`hello\ worlds`)
+  expect(e.Evaluate()).toStrictEqual(`hello\\ \t \r worlds`)
 })
 
 test('test builtins ', () => {
