@@ -202,22 +202,24 @@ function additive(
 ): LogicalExpression {
   let left = factor(scanner, literalFactory)
 
+  const operators = ['+', '-']
+  const operatorMap: Record<
+    string,
+    Extract<LogicalExpression, { type: 'binary' }>['operator']
+  > = {
+    '+': 'addition',
+    '-': 'subtraction',
+  } as const
+
   while (true) {
-    let matchedType: null | 'subtraction' | 'addition' = null
+    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
 
-    if (matchOperator(scanner, '+')) matchedType = 'addition'
-    if (matchedType === null && matchOperator(scanner, '-'))
-      matchedType = 'subtraction'
-
-    switch (matchedType) {
-      case 'subtraction':
-      case 'addition': {
-        const right = factor(scanner, literalFactory)
-        left = { type: 'binary', operator: matchedType, left, right }
-        break
-      }
-      case null:
-        return left
+    if (matchedOperator !== null && matchedOperator in operatorMap) {
+      const operator = operatorMap[matchedOperator]
+      const right = factor(scanner, literalFactory)
+      left = { type: 'binary', operator, left, right }
+    } else {
+      return left
     }
   }
 }
@@ -228,22 +230,24 @@ function factor(
 ): LogicalExpression {
   let left = unary(scanner, literalFactory)
 
+  const operators = ['/', '*']
+  const operatorMap: Record<
+    string,
+    Extract<LogicalExpression, { type: 'binary' }>['operator']
+  > = {
+    '*': 'multiplication',
+    '/': 'division',
+  } as const
+
   while (true) {
-    let matchedType: null | 'multiplication' | 'division' = null
+    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
 
-    if (matchOperator(scanner, '*')) matchedType = 'multiplication'
-    if (matchedType === null && matchOperator(scanner, '/'))
-      matchedType = 'division'
-
-    switch (matchedType) {
-      case 'multiplication':
-      case 'division': {
-        const right = unary(scanner, literalFactory)
-        left = { type: 'binary', operator: matchedType, left, right }
-        break
-      }
-      case null:
-        return left
+    if (matchedOperator !== null && matchedOperator in operatorMap) {
+      const operator = operatorMap[matchedOperator]
+      const right = unary(scanner, literalFactory)
+      left = { type: 'binary', operator, left, right }
+    } else {
+      return left
     }
   }
 }
@@ -327,24 +331,6 @@ function value(
   }
 
   throw new Error('Expected value')
-}
-
-function matchOperator(
-  scanner: Scanner,
-  operator: string,
-): Extract<Token, { type: 'operator' }> | null {
-  const nextToken = scanner.peek
-
-  if (
-    nextToken === null ||
-    nextToken.type !== 'operator' ||
-    nextToken.operator !== operator
-  ) {
-    return null
-  }
-
-  scanner.next()
-  return nextToken
 }
 
 function matchOperators(

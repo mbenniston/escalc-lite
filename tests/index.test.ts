@@ -31,3 +31,32 @@ test('test date comparison', () => {
   )
   expect(e.Evaluate()).toStrictEqual(true)
 })
+
+test('test complex2', () => {
+  const ast = new Expression(
+    'Max(Abs([a]-Sqrt([b]*[c])),Sin([d]+[e])*Cos([f]-[g]),([h]+[i])^2/Log([j]+10),Min([k],[l]+[m]*2),Log(Sqrt(Abs([n]-[o]+Min([p],[q])))))+Sqrt(Abs([r]-[s]/Max([t],1)))',
+  )
+  ast.Parameters = {
+    ['a']: 25,
+    ['b']: 4,
+    ['c']: 9,
+    ['d']: Math.PI / 2,
+    ['e']: 0,
+    ['f']: 0,
+    ['g']: 0,
+    ['h']: 2,
+    ['i']: 3,
+    ['j']: 5,
+    ['k']: 20,
+    ['l']: 6,
+    ['m']: 2,
+    ['n']: 18,
+    ['o']: 4,
+    ['p']: 3,
+    ['q']: 10,
+    ['r']: 20,
+    ['s']: 5,
+    ['t']: 0,
+  }
+  expect(ast.Evaluate()).toBeCloseTo(22.873, 3)
+})
