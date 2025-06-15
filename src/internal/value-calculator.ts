@@ -6,6 +6,11 @@ export type ExpressionParameter = {
 }
 
 export abstract class ValueCalculator {
+  abstract ternary(
+    left: ExpressionParameter,
+    middle: ExpressionParameter,
+    right: ExpressionParameter,
+  ): unknown
   abstract add(left: ExpressionParameter, right: ExpressionParameter): unknown
   abstract sub(left: ExpressionParameter, right: ExpressionParameter): unknown
   abstract div(left: ExpressionParameter, right: ExpressionParameter): unknown
@@ -290,5 +295,17 @@ export class DefaultValueCalculator implements ValueCalculator {
     }
 
     throw new Error('not implemented')
+  }
+
+  ternary(
+    left: ExpressionParameter,
+    middle: ExpressionParameter,
+    right: ExpressionParameter,
+  ): unknown {
+    const leftValue = left.evaluate()
+    if (typeof leftValue !== 'boolean') {
+      throw new TypeError('expected boolean')
+    }
+    return leftValue ? middle.evaluate() : right.evaluate()
   }
 }

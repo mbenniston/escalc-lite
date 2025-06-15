@@ -19,6 +19,8 @@ export class Tokenizer implements Iterator<Token> {
       return this.operator()
     } else if (isGroupOpen(nextCharacter)) {
       return this.groupOpen()
+    } else if (isColon(nextCharacter)) {
+      return this.colon()
     } else if (isGroupClose(nextCharacter)) {
       return this.groupClose()
     } else if (isParameter(nextCharacter)) {
@@ -38,6 +40,11 @@ export class Tokenizer implements Iterator<Token> {
       if (nextCharacter === null || !isWhitespace(nextCharacter)) return
       this.source.next()
     }
+  }
+
+  private colon(): Token {
+    this.source.next()
+    return { type: 'colon' }
   }
 
   private date(): Token {
@@ -222,6 +229,10 @@ function isGroupClose(s: string): boolean {
   return s === ')'
 }
 
+function isColon(s: string): boolean {
+  return s === ':'
+}
+
 function isSeparator(s: string): boolean {
   return s === ',' || s === ';'
 }
@@ -244,6 +255,7 @@ function isOperatorStart(s: string): boolean {
     case '<':
     case '=':
     case '!':
+    case '?':
     case '^':
     case '~':
     case '|':

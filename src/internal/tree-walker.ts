@@ -29,6 +29,22 @@ export function execute(
       }
     }
     case 'ternary':
+      {
+        const leftParam: ExpressionParameter = {
+          evaluate: () => execute(expression.left, options),
+          expression: expression.left,
+        }
+        const middleParam: ExpressionParameter = {
+          evaluate: () => execute(expression.middle, options),
+          expression: expression.middle,
+        }
+        const rightParam: ExpressionParameter = {
+          evaluate: () => execute(expression.right, options),
+          expression: expression.right,
+        }
+
+        return options.calculator.ternary(leftParam, middleParam, rightParam)
+      }
       break
     case 'binary': {
       const leftParam: ExpressionParameter = {

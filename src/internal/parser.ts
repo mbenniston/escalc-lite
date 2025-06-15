@@ -20,7 +20,29 @@ function logicalExpression(
   scanner: Scanner,
   literalFactory: LiteralFactory,
 ): LogicalExpression {
-  return or(scanner, literalFactory)
+  return ternary(scanner, literalFactory)
+}
+
+function ternary(scanner: Scanner, literalFactory: LiteralFactory) {
+  let left = or(scanner, literalFactory)
+
+  while (true) {
+    const matchedOperator = matchOperators(scanner, ['?'])?.operator ?? null
+
+    if (matchedOperator !== null) {
+      const middle = or(scanner, literalFactory)
+
+      if (scanner.next()?.type !== 'colon') {
+        throw new Error('Expected colon')
+      }
+
+      const right = or(scanner, literalFactory)
+
+      left = { type: 'ternary', left, middle, right }
+    } else {
+      return left
+    }
+  }
 }
 
 function or(scanner: Scanner, literalFactory: LiteralFactory) {

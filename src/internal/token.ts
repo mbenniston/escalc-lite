@@ -11,4 +11,5 @@ export type Token =
   | { type: 'group-open' }
   | { type: 'group-close' }
   | { type: 'separator' }
+  | { type: 'colon' }
   | { type: 'parameter'; name: string }

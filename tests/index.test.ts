@@ -18,8 +18,8 @@ test('test escape ', () => {
 })
 
 test('test builtins ', () => {
-  const e = new Expression('Max(7,4,6)')
-  expect(e.Evaluate()).toStrictEqual(7)
+  const e = new Expression(' 5 ? 3 : 1')
+  expect(e.Evaluate()).toStrictEqual(3)
 })
 
 test('test separators ', () => {
