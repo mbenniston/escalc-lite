@@ -133,6 +133,39 @@ export const builtIns: Record<string, ExpressionFunction> = {
   Sqrt: (args) => Math.sqrt(asNumber(args[0])),
   Tan: (args) => Math.tan(asNumber(args[0])),
   Truncate: (args) => truncate(asNumber(args[0])),
+  ['if']: (args) => {
+    if (args.length !== 3) {
+      throw new Error('if requires three parameters')
+    }
+    const condition = args[0].evaluate()
+    if (typeof condition !== 'boolean') {
+      throw new TypeError('condition must be a boolean')
+    }
+    return condition ? args[1].evaluate() : args[2].evaluate()
+  },
+  ['ifs']: (args) => {
+    if (args.length < 3) {
+      throw new Error('not enough parameters')
+    }
+
+    if (args.length % 2 === 0) {
+      throw new Error('default must be provided')
+    }
+
+    let i = 0
+    for (; i < args.length - 1; i += 2) {
+      const condition = args[i].evaluate()
+      if (typeof condition !== 'boolean') {
+        throw new TypeError('condition must be a boolean')
+      }
+      if (condition) return args[i + 1].evaluate()
+    }
+    const defaultArg = args.at(-1)
+    if (defaultArg === undefined) {
+      throw new Error('Expect default')
+    }
+    return defaultArg.evaluate()
+  },
 }
 
 function asNumber(param: ExpressionParameter): number {

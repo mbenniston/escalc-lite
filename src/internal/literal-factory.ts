@@ -13,7 +13,7 @@ export class DefaultLiteralFactory implements LiteralFactory {
         return Number(value.value)
       case 'boolean': {
         if (value.value === 'false') return false
-        if (value.value === 'true') return false
+        if (value.value === 'true') return true
         throw new Error('invalid boolean value')
       }
       case 'string':

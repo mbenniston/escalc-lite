@@ -214,7 +214,6 @@ export class DefaultValueCalculator implements ValueCalculator {
   bitLeftShift(left: ExpressionParameter, right: ExpressionParameter): unknown {
     const leftValue = left.evaluate()
     const rightValue = right.evaluate()
-
     if (typeof leftValue === 'number' && typeof rightValue === 'number') {
       return leftValue << rightValue
     }

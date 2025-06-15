@@ -10,5 +10,5 @@ export type Token =
     }
   | { type: 'group-open' }
   | { type: 'group-close' }
-  | { type: 'comma' }
+  | { type: 'separator' }
   | { type: 'parameter'; name: string }

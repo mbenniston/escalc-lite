@@ -23,8 +23,8 @@ export class Tokenizer implements Iterator<Token> {
       return this.groupClose()
     } else if (isParameter(nextCharacter)) {
       return this.parameter()
-    } else if (isComma(nextCharacter)) {
-      return this.comma()
+    } else if (isSeparator(nextCharacter)) {
+      return this.separator()
     } else if (isIdentifierStart(nextCharacter)) {
       return this.identifier()
     } else {
@@ -127,6 +127,7 @@ export class Tokenizer implements Iterator<Token> {
       (operator === '&' && nextCharacter === '&') ||
       (operator === '>' && nextCharacter === '>') ||
       (operator === '<' && nextCharacter === '<') ||
+      (operator === '<' && nextCharacter === '>') ||
       (operator === '|' && nextCharacter === '|')
     ) {
       this.source.next()
@@ -146,9 +147,9 @@ export class Tokenizer implements Iterator<Token> {
     return { type: 'group-close' }
   }
 
-  private comma(): Token {
+  private separator(): Token {
     this.source.next()
-    return { type: 'comma' }
+    return { type: 'separator' }
   }
 
   private identifier(): Token {
@@ -221,8 +222,8 @@ function isGroupClose(s: string): boolean {
   return s === ')'
 }
 
-function isComma(s: string): boolean {
-  return s === ','
+function isSeparator(s: string): boolean {
+  return s === ',' || s === ';'
 }
 
 function isIdentifierStart(s: string): boolean {

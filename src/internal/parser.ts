@@ -73,7 +73,7 @@ function and(scanner: Scanner, literalFactory: LiteralFactory) {
 function comparison(scanner: Scanner, literalFactory: LiteralFactory) {
   let left = bitOr(scanner, literalFactory)
 
-  const operators = ['>', '<', '<=', '>=', '!=', '==']
+  const operators = ['>', '<', '<=', '>=', '!=', '==', '<>']
   const operatorMap: Record<
     string,
     Extract<LogicalExpression, { type: 'binary' }>['operator']
@@ -83,6 +83,7 @@ function comparison(scanner: Scanner, literalFactory: LiteralFactory) {
     '<=': 'less-than-equal',
     '>=': 'more-than-equal',
     '!=': 'not-equals',
+    '<>': 'not-equals',
     '==': 'equals',
   } as const
 
@@ -307,13 +308,14 @@ function value(
       while (true) {
         args.push(logicalExpression(scanner, literalFactory))
 
-        if (scanner.peek?.type !== 'comma') break
+        if (scanner.peek?.type !== 'separator') break
         scanner.next()
       }
     }
 
-    if (scanner.next()?.type !== 'group-close') {
-      throw new Error('Expected group-close')
+    const groupCloseToken = scanner.next()?.type
+    if (groupCloseToken !== 'group-close') {
+      throw new Error(`Expected group-close got ${groupCloseToken}`)
     }
 
     return { type: 'function', name: nextToken.identifier, arguments: args }
