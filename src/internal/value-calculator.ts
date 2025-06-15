@@ -60,12 +60,43 @@ export abstract class ValueCalculator {
     left: ExpressionParameter,
     right: ExpressionParameter,
   ): unknown
+  abstract modulus(
+    left: ExpressionParameter,
+    right: ExpressionParameter,
+  ): unknown
+  abstract exponentiation(
+    left: ExpressionParameter,
+    right: ExpressionParameter,
+  ): unknown
   abstract not(left: ExpressionParameter): unknown
   abstract bitComplement(left: ExpressionParameter): unknown
   abstract negate(left: ExpressionParameter): unknown
 }
 
 export class DefaultValueCalculator implements ValueCalculator {
+  modulus(left: ExpressionParameter, right: ExpressionParameter): unknown {
+    const leftValue = left.evaluate()
+    const rightValue = right.evaluate()
+
+    if (typeof leftValue === 'number' && typeof rightValue === 'number') {
+      return leftValue % rightValue
+    }
+
+    throw new Error('not implemented')
+  }
+  exponentiation(
+    left: ExpressionParameter,
+    right: ExpressionParameter,
+  ): unknown {
+    const leftValue = left.evaluate()
+    const rightValue = right.evaluate()
+
+    if (typeof leftValue === 'number' && typeof rightValue === 'number') {
+      return leftValue ** rightValue
+    }
+
+    throw new Error('not implemented')
+  }
   in(left: ExpressionParameter, right: ExpressionParameter): unknown {
     const leftValue = left.evaluate()
     const rightValue = right.evaluate()
@@ -178,7 +209,9 @@ export class DefaultValueCalculator implements ValueCalculator {
   equals(left: ExpressionParameter, right: ExpressionParameter): unknown {
     const leftValue = left.evaluate()
     const rightValue = right.evaluate()
-
+    if (typeof leftValue === 'string' && typeof rightValue === 'string') {
+      return leftValue === rightValue
+    }
     if (typeof leftValue === 'boolean' && typeof rightValue === 'boolean') {
       return leftValue === rightValue
     }
@@ -191,7 +224,7 @@ export class DefaultValueCalculator implements ValueCalculator {
       return leftValue.getTime() === rightValue.getTime()
     }
 
-    throw new Error('not implemented')
+    throw new Error(`not implemented ${leftValue}=${rightValue}`)
   }
   and(left: ExpressionParameter, right: ExpressionParameter): unknown {
     const leftValue = left.evaluate()

@@ -178,6 +178,7 @@ export class Tokenizer implements Iterator<Token> {
       (operator === '>' && nextCharacter === '>') ||
       (operator === '<' && nextCharacter === '<') ||
       (operator === '<' && nextCharacter === '>') ||
+      (operator === '*' && nextCharacter === '*') ||
       (operator === '|' && nextCharacter === '|')
     ) {
       this.source.next()
@@ -340,6 +341,7 @@ function isOperatorStart(s: string): boolean {
     case '?':
     case '^':
     case '~':
+    case '%':
     case '|':
     case '&':
       return true
@@ -348,7 +350,7 @@ function isOperatorStart(s: string): boolean {
 }
 
 function isWhitespace(s: string): boolean {
-  return s === ' '
+  return [' ', '\n', '\t', '\r'].includes(s)
 }
 
 abstract class Iterator<T> {

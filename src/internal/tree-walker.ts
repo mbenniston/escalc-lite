@@ -61,6 +61,10 @@ export function execute(
       }
 
       switch (expression.operator) {
+        case 'modulus':
+          return options.calculator.modulus(leftParam, rightParam)
+        case 'exponentiation':
+          return options.calculator.exponentiation(leftParam, rightParam)
         case 'in':
           return options.calculator.in(leftParam, rightParam)
         case 'not-in':
@@ -134,7 +138,7 @@ export function execute(
     }
   }
 
-  throw new Error('unhandled expression')
+  throw new Error(`unhandled expression ${JSON.stringify(expression)}`)
 }
 
 export const builtIns: Record<string, ExpressionFunction> = {

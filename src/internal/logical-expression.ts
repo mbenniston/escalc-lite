@@ -12,6 +12,8 @@ export type LogicalExpression =
         | 'addition'
         | 'multiplication'
         | 'division'
+        | 'modulus'
+        | 'exponentiation'
         | 'more-than'
         | 'less-than'
         | 'more-than-equal'

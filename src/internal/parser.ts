@@ -107,7 +107,7 @@ function comparison(
 ): LogicalExpression {
   let left = bitOr(scanner, literalFactory)
 
-  const operators = ['>', '<', '<=', '>=', '!=', '==', '<>']
+  const operators = ['>', '<', '<=', '>=', '!=', '==', '=', '<>']
   const operatorMap: Record<
     string,
     Extract<LogicalExpression, { type: 'binary' }>['operator']
@@ -119,6 +119,7 @@ function comparison(
     '!=': 'not-equals',
     '<>': 'not-equals',
     '==': 'equals',
+    '=': 'equals',
   } as const
 
   while (true) {
@@ -292,15 +293,16 @@ function factor(
   scanner: Scanner,
   literalFactory: LiteralFactory,
 ): LogicalExpression {
-  let left = unary(scanner, literalFactory)
+  let left = exponentiation(scanner, literalFactory)
 
-  const operators = ['/', '*']
+  const operators = ['/', '*', '%']
   const operatorMap: Record<
     string,
     Extract<LogicalExpression, { type: 'binary' }>['operator']
   > = {
     '*': 'multiplication',
     '/': 'division',
+    '%': 'modulus',
   } as const
 
   while (true) {
@@ -308,11 +310,27 @@ function factor(
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
-      const right = unary(scanner, literalFactory)
+      const right = exponentiation(scanner, literalFactory)
       left = { type: 'binary', operator, left, right }
     } else {
       return left
     }
+  }
+}
+
+function exponentiation(
+  scanner: Scanner,
+  literalFactory: LiteralFactory,
+): LogicalExpression {
+  const left = unary(scanner, literalFactory)
+
+  const matchedOperator = matchOperators(scanner, ['**'])?.operator ?? null
+
+  if (matchedOperator !== null) {
+    const right = exponentiation(scanner, literalFactory)
+    return { type: 'binary', operator: 'exponentiation', left, right }
+  } else {
+    return left
   }
 }
 
@@ -415,7 +433,9 @@ function value(
     peekTokenType = scanner.peek?.type
     if (peekTokenType !== 'separator') {
       if (peekTokenType !== 'group-close') {
-        throw new Error('expected group close')
+        throw new Error(
+          `expected group close got ${JSON.stringify(scanner.peek)}`,
+        )
       }
       scanner.next()
       return expression
@@ -443,7 +463,7 @@ function value(
     return { type: 'value', value: { type: 'list', items } }
   }
 
-  throw new Error('Expected value')
+  throw new Error(`Expected value got ${JSON.stringify(nextToken)}`)
 }
 
 function matchOperators(
