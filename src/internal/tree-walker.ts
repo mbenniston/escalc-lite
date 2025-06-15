@@ -1,7 +1,7 @@
 import type { LogicalExpression } from './logical-expression'
 import type { ExpressionParameter, ValueCalculator } from './value-calculator'
 
-type EvaluationOptions = {
+export type EvaluationOptions = {
   expressionArguments: Record<string, unknown>
   expressionFunctions: Record<string, ExpressionFunction>
   calculator: ValueCalculator
@@ -98,18 +98,17 @@ export function execute(
         expression: arg,
         evaluate: () => execute(arg, options),
       }))
-
-      if (expression.name in builtIns) {
-        return builtIns[expression.name](args, options)
-      }
       if (expression.name in options.expressionFunctions) {
         return options.expressionFunctions[expression.name](args, options)
+      }
+      if (expression.name in builtIns) {
+        return builtIns[expression.name](args, options)
       }
     }
   }
 }
 
-const builtIns: Record<string, ExpressionFunction> = {
+export const builtIns: Record<string, ExpressionFunction> = {
   Abs: (args) => Math.abs(asNumber(args[0])),
   Acos: (args) => Math.acos(asNumber(args[0])),
   Asin: (args) => Math.asin(asNumber(args[0])),

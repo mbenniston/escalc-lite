@@ -3,17 +3,26 @@ import {
   type LiteralFactory,
 } from '../internal/literal-factory'
 import { parse } from '../internal/parser'
-import { execute } from '../internal/tree-walker'
+import {
+  builtIns,
+  execute,
+  type EvaluationOptions,
+} from '../internal/tree-walker'
 import {
   DefaultValueCalculator,
+  type ExpressionParameter,
   type ValueCalculator,
 } from '../internal/value-calculator'
 import type { LogicalExpression } from '../internal/logical-expression'
 
 export class Expression {
+  public static readonly BuiltIns = builtIns
   private readonly _logicalExpression: LogicalExpression
   public Parameters: Record<string, unknown> = {}
-  public EvaluateFunctions: Record<string, (args: unknown) => unknown> = {}
+  public EvaluateFunctions: Record<
+    string,
+    (args: ExpressionParameter[], options: EvaluationOptions) => unknown
+  > = {}
   public Calculator: ValueCalculator = new DefaultValueCalculator()
 
   constructor(

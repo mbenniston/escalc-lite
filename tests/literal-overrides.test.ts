@@ -71,6 +71,25 @@ class DecimalCalculator extends DefaultValueCalculator {
   }
 }
 
+test('custom decimal with builtin overrides', () => {
+  const expression = new Expression('Sin(3)', {
+    literalFactory: new DecimalLiteralFactory(),
+  })
+  expression.Calculator = new DecimalCalculator()
+  expression.EvaluateFunctions.Sin = (args, options) => {
+    const arg = args[0].evaluate()
+    if (arg instanceof Decimal) {
+      return arg.sin()
+    }
+
+    return Expression.BuiltIns.Sin(args, options)
+  }
+  const result = expression.Evaluate()
+  if (!(result instanceof Decimal)) throw new Error('Expected decimal argument')
+
+  expect(result.toSD(15).toString()).toBe('0.141120008059867')
+})
+
 test('evaluate with complex expression', () => {
   const expression = new Expression(
     '(((([a]+([b]*([c]-[d]/([e]+[f]))))-(([g]+[h])*([i]-([j]/([k]+[l]-[m])))))+([n]*([o]+[p]-([q]*[r]/([s]+[t])))))/((([u]+[v])*([w]-[x]+([y]/([z]+[aa]))))+([ab]-[ac]+([ad]/([ae]+[af]-[ag])))))+(([ah]*([ai]+[aj]-([ak]/([al]+[am]))))-(([an]+[ao])/([ap]-[aq]+[ar]))+[as])',
