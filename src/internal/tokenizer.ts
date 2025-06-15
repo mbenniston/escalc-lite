@@ -9,7 +9,7 @@ export class Tokenizer implements Iterator<Token> {
 
     if (nextCharacter === null) return null
 
-    if (isNumber(nextCharacter)) {
+    if (isNumberStart(nextCharacter)) {
       return this.number()
     } else if (isStringStart(nextCharacter)) {
       return this.string()
@@ -125,6 +125,39 @@ export class Tokenizer implements Iterator<Token> {
       completeLiteral += nextCharacter
       this.source.next()
     }
+
+    if (this.source.peek === '.') {
+      this.source.next()
+      completeLiteral += '.'
+    }
+
+    while (true) {
+      const nextCharacter = this.source.peek
+      if (nextCharacter === null || !isNumber(nextCharacter)) break
+      completeLiteral += nextCharacter
+      this.source.next()
+    }
+
+    if (this.source.peek === 'e') {
+      this.source.next()
+      completeLiteral += 'e'
+    }
+
+    if (this.source.peek === '-') {
+      this.source.next()
+      completeLiteral += '-'
+    } else if (this.source.peek === '+') {
+      this.source.next()
+      completeLiteral += '+'
+    }
+
+    while (true) {
+      const nextCharacter = this.source.peek
+      if (nextCharacter === null || !isNumber(nextCharacter)) break
+      completeLiteral += nextCharacter
+      this.source.next()
+    }
+
     return {
       type: 'literal',
       value: { type: 'number', value: completeLiteral },
@@ -212,6 +245,24 @@ export class Tokenizer implements Iterator<Token> {
 
     return { type: 'parameter', name }
   }
+}
+
+function isNumberStart(s: string): boolean {
+  switch (s) {
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+    case '.':
+      return true
+  }
+  return false
 }
 
 function isNumber(s: string): boolean {
