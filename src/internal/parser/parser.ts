@@ -1,8 +1,6 @@
-import {
-  BufferedIterator,
-  CharacterIterator,
-  Tokenizer,
-} from '../tokenizer/tokenizer'
+import { BufferedStream } from '../stream/buffered-stream'
+import { CharacterStream } from '../stream/character-stream'
+import { Tokenizer } from '../tokenizer/tokenizer'
 import type { OperatorToken, Token } from '../tokenizer/token'
 import type { LiteralFactory } from './literal-factory'
 import type {
@@ -11,14 +9,14 @@ import type {
   UnaryExpression,
 } from './logical-expression'
 
-export type Scanner = BufferedIterator<Token>
+export type Scanner = BufferedStream<Token>
 
 export function parse(
   expression: string,
   literalFactory: LiteralFactory,
 ): LogicalExpression {
-  const scanner = new BufferedIterator(
-    new Tokenizer(new BufferedIterator(new CharacterIterator(expression))),
+  const scanner = new BufferedStream(
+    new Tokenizer(new BufferedStream(new CharacterStream(expression))),
   )
 
   return logicalExpression(scanner, literalFactory)

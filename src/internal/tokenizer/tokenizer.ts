@@ -1,7 +1,9 @@
+import type { BufferedStream } from '../stream/buffered-stream'
+import type { Stream } from '../stream/stream'
 import type { Token } from './token'
 
-export class Tokenizer implements Iterator<Token> {
-  constructor(private readonly source: BufferedIterator<string>) {}
+export class Tokenizer implements Stream<Token> {
+  constructor(private readonly source: BufferedStream<string>) {}
 
   next(): Token | null {
     this.skipWhitespace()
@@ -351,40 +353,4 @@ function isOperatorStart(s: string): boolean {
 
 function isWhitespace(s: string): boolean {
   return [' ', '\n', '\t', '\r'].includes(s)
-}
-
-abstract class Iterator<T> {
-  public abstract next(): T | null
-}
-
-export class BufferedIterator<T> implements Iterator<T> {
-  private _peek: T | null = null
-
-  constructor(private readonly source: Iterator<T>) {}
-
-  get peek() {
-    if (this._peek === null) {
-      this._peek = this.source.next()
-    }
-    return this._peek
-  }
-
-  next(): T | null {
-    const oldPeek = this.peek
-    this._peek = this.source.next()
-    return oldPeek
-  }
-}
-
-export class CharacterIterator implements Iterator<string> {
-  private index: number = 0
-
-  constructor(private readonly source: string) {}
-
-  next() {
-    if (this.index >= this.source.length) {
-      return null
-    }
-    return this.source.charAt(this.index++)
-  }
 }
