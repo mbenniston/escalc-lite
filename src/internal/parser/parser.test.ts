@@ -147,6 +147,7 @@ test.each([
   '1 ^ 2',
   '1 << 2',
   '1 >> 2',
+  'Fun()',
 ])('complex %s', (expr) => {
   expect(parse(expr)).toMatchSnapshot(expr)
 })

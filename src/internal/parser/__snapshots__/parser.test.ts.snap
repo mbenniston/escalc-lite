@@ -521,6 +521,35 @@ exports[`complex 1 & 2 > 1 & 2 1`] = `
 }
 `;
 
+exports[`complex 1 && not !true > 1 && not !true 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "and",
+  "right": {
+    "expression": {
+      "expression": {
+        "type": "value",
+        "value": {
+          "type": "constant",
+          "value": true,
+        },
+      },
+      "operator": "not",
+      "type": "unary",
+    },
+    "operator": "not",
+    "type": "unary",
+  },
+  "type": "binary",
+}
+`;
+
 exports[`complex 1 * 2 > 1 * 2 1`] = `
 {
   "left": {
@@ -905,6 +934,31 @@ exports[`complex 1 - 2 > 1 - 2 1`] = `
 }
 `;
 
+exports[`complex 1 in !true > 1 in !true 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "in",
+  "right": {
+    "expression": {
+      "type": "value",
+      "value": {
+        "type": "constant",
+        "value": true,
+      },
+    },
+    "operator": "not",
+    "type": "unary",
+  },
+  "type": "binary",
+}
+`;
+
 exports[`complex 1 not in (1,) > 1 not in (1,) 1`] = `
 {
   "left": {
@@ -931,6 +985,14 @@ exports[`complex 1 not in (1,) > 1 not in (1,) 1`] = `
     },
   },
   "type": "binary",
+}
+`;
+
+exports[`complex Fun() > Fun() 1`] = `
+{
+  "arguments": [],
+  "name": "Fun",
+  "type": "function",
 }
 `;
 

@@ -1,15 +1,15 @@
 import { BufferedStream } from '../stream/buffered-stream'
 import { CharacterStream } from '../stream/character-stream'
 import { Tokenizer } from '../tokenizer/tokenizer'
-import type { OperatorToken, Token } from '../tokenizer/token'
+import { SemanticError } from './errors/semantic-error'
+import { UnexpectedTokenError } from './errors/unexpected-token-error'
 import { DefaultLiteralFactory, type LiteralFactory } from './literal-factory'
+import { match, matchOperators, matchOrThrow, type Scanner } from './utils'
 import type {
   BinaryExpression,
   LogicalExpression,
   UnaryExpression,
 } from './logical-expression'
-
-export type Scanner = BufferedStream<Token>
 
 const defaultLiteralFactory = new DefaultLiteralFactory()
 
@@ -38,14 +38,12 @@ function ternary(
   let left = or(scanner, literalFactory)
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, ['?'])?.operator ?? null
+    const matchedOperator = matchOperators(scanner, ['?'])
 
     if (matchedOperator !== null) {
       const middle = or(scanner, literalFactory)
 
-      if (scanner.next()?.type !== 'colon') {
-        throw new Error('Expected colon')
-      }
+      matchOrThrow(scanner, 'colon')
 
       const right = or(scanner, literalFactory)
 
@@ -68,7 +66,7 @@ function or(
   } as const
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators)
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -91,7 +89,7 @@ function and(
   } as const
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators)
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -122,24 +120,20 @@ function comparison(
   } as const
 
   while (true) {
-    let scannerPeek = scanner.peek
-    if (scannerPeek?.type === 'operator' && scannerPeek.operator === 'not') {
-      scanner.next()
-      scannerPeek = scanner.peek
-      if (scannerPeek?.type !== 'operator' || scannerPeek.operator !== 'in') {
-        throw new Error('expect in after not in comparison')
+    if (matchOperators(scanner, ['not'])) {
+      if (matchOrThrow(scanner, 'operator').operator !== 'in') {
+        throw new SemanticError('Expected "in" after "not"')
       }
-      scanner.next()
+
       const items = bitOr(scanner, literalFactory)
       return { type: 'binary', operator: 'not-in', left, right: items }
     }
-    if (scannerPeek?.type === 'operator' && scannerPeek.operator === 'in') {
-      scanner.next()
+    if (matchOperators(scanner, ['in'])) {
       const items = bitOr(scanner, literalFactory)
       return { type: 'binary', operator: 'in', left, right: items }
     }
 
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators)
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -163,7 +157,7 @@ function bitOr(
   } as const
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators)
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -187,7 +181,7 @@ function bitXor(
   } as const
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators)
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -211,7 +205,7 @@ function bitAnd(
   } as const
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators) ?? null
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -236,7 +230,7 @@ function bitShift(
   } as const
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators) ?? null
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -261,7 +255,7 @@ function additive(
   } as const
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators) ?? null
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -287,7 +281,7 @@ function factor(
   } as const
 
   while (true) {
-    const matchedOperator = matchOperators(scanner, operators)?.operator ?? null
+    const matchedOperator = matchOperators(scanner, operators) ?? null
 
     if (matchedOperator !== null && matchedOperator in operatorMap) {
       const operator = operatorMap[matchedOperator]
@@ -305,7 +299,7 @@ function exponentiation(
 ): LogicalExpression {
   const left = unary(scanner, literalFactory)
 
-  const matchedOperator = matchOperators(scanner, ['**'])?.operator ?? null
+  const matchedOperator = matchOperators(scanner, ['**'])
 
   if (matchedOperator !== null) {
     const right = exponentiation(scanner, literalFactory)
@@ -329,135 +323,94 @@ function unary(
   const operators: (typeof operatorMap)['string'][] = []
 
   while (true) {
-    const operatorToken = matchOperators(scanner, ['~', '!', '-', 'not'])
+    const operator = matchOperators(scanner, ['~', '!', '-', 'not'])
 
-    if (operatorToken !== null && operatorToken.operator in operatorMap) {
-      operators.push(operatorMap[operatorToken.operator])
+    if (operator !== null && operator in operatorMap) {
+      operators.push(operatorMap[operator])
     } else {
       break
     }
   }
 
-  let v = value(scanner, literalFactory)
+  let expression = value(scanner, literalFactory)
   for (const operator of operators) {
-    v = { type: 'unary', operator, expression: v }
+    expression = { type: 'unary', operator, expression }
   }
 
-  return v
+  return expression
 }
 
 function value(
   scanner: Scanner,
   literalFactory: LiteralFactory,
 ): LogicalExpression {
-  const nextToken = scanner.next()
-  if (nextToken?.type === 'literal') {
+  const literal = match(scanner, 'literal')
+  if (literal) {
     return {
       type: 'value',
       value: {
         type: 'constant',
-        value: literalFactory.create(nextToken.value),
+        value: literalFactory.create(literal.value),
       },
     }
   }
 
-  if (nextToken?.type === 'parameter') {
+  const parameter = match(scanner, 'parameter')
+  if (parameter) {
     return {
       type: 'value',
-      value: { type: 'parameter', name: nextToken.name },
+      value: { type: 'parameter', name: parameter.name },
     }
   }
 
-  if (nextToken?.type === 'identifier') {
+  const identifier = match(scanner, 'identifier')
+  if (identifier) {
     const args: LogicalExpression[] = []
 
-    let peekTokenType: Token['type'] | undefined = scanner.peek?.type
-    if (peekTokenType !== 'group-open') {
+    if (!match(scanner, 'group-open')) {
       return {
         type: 'value',
-        value: { type: 'parameter', name: nextToken.identifier },
+        value: { type: 'parameter', name: identifier.identifier },
       }
     }
 
-    scanner.next()
-
-    peekTokenType = scanner.peek?.type
-    if (peekTokenType !== 'group-close') {
+    if (!match(scanner, 'group-close')) {
       while (true) {
         args.push(logicalExpression(scanner, literalFactory))
 
-        if (scanner.peek?.type !== 'separator') break
-        scanner.next()
+        if (!match(scanner, 'separator')) break
       }
+      matchOrThrow(scanner, 'group-close')
     }
 
-    const groupCloseToken = scanner.next()?.type
-    if (groupCloseToken !== 'group-close') {
-      throw new Error(`Expected group-close got ${groupCloseToken}`)
-    }
-
-    return { type: 'function', name: nextToken.identifier, arguments: args }
+    return { type: 'function', name: identifier.identifier, arguments: args }
   }
 
-  if (nextToken?.type === 'group-open') {
-    let peekTokenType: Token['type'] | undefined = scanner.peek?.type
-    if (peekTokenType === 'group-close') {
-      scanner.next()
+  if (match(scanner, 'group-open')) {
+    if (match(scanner, 'group-close')) {
       return { type: 'value', value: { type: 'list', items: [] } }
     }
 
     const expression = logicalExpression(scanner, literalFactory)
 
-    peekTokenType = scanner.peek?.type
-    if (peekTokenType !== 'separator') {
-      if (peekTokenType !== 'group-close') {
-        throw new Error(
-          `expected group close got ${JSON.stringify(scanner.peek)}`,
-        )
-      }
-      scanner.next()
+    if (!match(scanner, 'separator')) {
+      matchOrThrow(scanner, 'group-close')
       return expression
     }
 
-    scanner.next()
-
     const items: LogicalExpression[] = [expression]
 
-    peekTokenType = scanner.peek?.type
-    if (peekTokenType !== 'group-close') {
+    if (!match(scanner, 'group-close')) {
       while (true) {
         items.push(logicalExpression(scanner, literalFactory))
 
-        if (scanner.peek?.type !== 'separator') break
+        if (!match(scanner, 'separator')) break
         scanner.next()
       }
-    }
-
-    const groupCloseToken = scanner.next()?.type
-    if (groupCloseToken !== 'group-close') {
-      throw new Error(`Expected group-close got ${groupCloseToken}`)
     }
 
     return { type: 'value', value: { type: 'list', items } }
   }
 
-  throw new Error(`Expected value got ${JSON.stringify(nextToken)}`)
-}
-
-function matchOperators(
-  scanner: Scanner,
-  operators: string[],
-): OperatorToken | null {
-  const nextToken = scanner.peek
-
-  if (
-    nextToken === null ||
-    nextToken.type !== 'operator' ||
-    !operators.includes(nextToken.operator)
-  ) {
-    return null
-  }
-
-  scanner.next()
-  return nextToken
+  throw new UnexpectedTokenError('literal', scanner.peek)
 }
