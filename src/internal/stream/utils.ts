@@ -1,4 +1,4 @@
-export { Stream } from './stream'
+export { type Stream } from './stream'
 
 export function collect<T>(iterator: Stream<T>): T[] {
   const items: T[] = []

@@ -2,7 +2,7 @@ import { BufferedStream } from '../stream/buffered-stream'
 import { CharacterStream } from '../stream/character-stream'
 import { Tokenizer } from '../tokenizer/tokenizer'
 import type { OperatorToken, Token } from '../tokenizer/token'
-import type { LiteralFactory } from './literal-factory'
+import { DefaultLiteralFactory, type LiteralFactory } from './literal-factory'
 import type {
   BinaryExpression,
   LogicalExpression,
@@ -11,9 +11,11 @@ import type {
 
 export type Scanner = BufferedStream<Token>
 
+const defaultLiteralFactory = new DefaultLiteralFactory()
+
 export function parse(
   expression: string,
-  literalFactory: LiteralFactory,
+  literalFactory: LiteralFactory = defaultLiteralFactory,
 ): LogicalExpression {
   const scanner = new BufferedStream(
     new Tokenizer(new BufferedStream(new CharacterStream(expression))),

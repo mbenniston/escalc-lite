@@ -1,0 +1,1042 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`complex !!false > !!false 1`] = `
+{
+  "expression": {
+    "expression": {
+      "type": "value",
+      "value": {
+        "type": "constant",
+        "value": false,
+      },
+    },
+    "operator": "not",
+    "type": "unary",
+  },
+  "operator": "not",
+  "type": "unary",
+}
+`;
+
+exports[`complex !false > !false 1`] = `
+{
+  "expression": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "operator": "not",
+  "type": "unary",
+}
+`;
+
+exports[`complex () > () 1`] = `
+{
+  "type": "value",
+  "value": {
+    "items": [],
+    "type": "list",
+  },
+}
+`;
+
+exports[`complex (1,) > (1,) 1`] = `
+{
+  "type": "value",
+  "value": {
+    "items": [
+      {
+        "type": "value",
+        "value": {
+          "type": "constant",
+          "value": 1,
+        },
+      },
+    ],
+    "type": "list",
+  },
+}
+`;
+
+exports[`complex (1,2) > (1,2) 1`] = `
+{
+  "type": "value",
+  "value": {
+    "items": [
+      {
+        "type": "value",
+        "value": {
+          "type": "constant",
+          "value": 1,
+        },
+      },
+      {
+        "type": "value",
+        "value": {
+          "type": "constant",
+          "value": 2,
+        },
+      },
+    ],
+    "type": "list",
+  },
+}
+`;
+
+exports[`complex > [1] < #11/06/2000# 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "name": "1",
+      "type": "parameter",
+    },
+  },
+  "operator": "less-than",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2000-11-06T00:00:00.000Z,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > 1  in (1,) 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "in",
+  "right": {
+    "type": "value",
+    "value": {
+      "items": [
+        {
+          "type": "value",
+          "value": {
+            "type": "constant",
+            "value": 1,
+          },
+        },
+      ],
+      "type": "list",
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > 1 < 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "less-than",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > 1 <= 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "less-than-equal",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > 1 > 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "more-than",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > 1 >= 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "more-than-equal",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > 1 not in (1,) 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "not-in",
+  "right": {
+    "type": "value",
+    "value": {
+      "items": [
+        {
+          "type": "value",
+          "value": {
+            "type": "constant",
+            "value": 1,
+          },
+        },
+      ],
+      "type": "list",
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > true && false 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": true,
+    },
+  },
+  "operator": "and",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > true || false 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": true,
+    },
+  },
+  "operator": "or",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > true and false 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": true,
+    },
+  },
+  "operator": "and",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex > true or false 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": true,
+    },
+  },
+  "operator": "or",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex [1] < #11/06/2000# > [1] < #11/06/2000# 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "name": "1",
+      "type": "parameter",
+    },
+  },
+  "operator": "less-than",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2000-11-06T00:00:00.000Z,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex ~~~~1 > ~~~~1 1`] = `
+{
+  "expression": {
+    "expression": {
+      "expression": {
+        "expression": {
+          "type": "value",
+          "value": {
+            "type": "constant",
+            "value": 1,
+          },
+        },
+        "operator": "bit-complement",
+        "type": "unary",
+      },
+      "operator": "bit-complement",
+      "type": "unary",
+    },
+    "operator": "bit-complement",
+    "type": "unary",
+  },
+  "operator": "bit-complement",
+  "type": "unary",
+}
+`;
+
+exports[`complex ~1 > ~1 1`] = `
+{
+  "expression": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "bit-complement",
+  "type": "unary",
+}
+`;
+
+exports[`complex ---1 > ---1 1`] = `
+{
+  "expression": {
+    "expression": {
+      "expression": {
+        "type": "value",
+        "value": {
+          "type": "constant",
+          "value": 1,
+        },
+      },
+      "operator": "negate",
+      "type": "unary",
+    },
+    "operator": "negate",
+    "type": "unary",
+  },
+  "operator": "negate",
+  "type": "unary",
+}
+`;
+
+exports[`complex -1 > -1 1`] = `
+{
+  "expression": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "negate",
+  "type": "unary",
+}
+`;
+
+exports[`complex 1  in (1,) > 1  in (1,) 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "in",
+  "right": {
+    "type": "value",
+    "value": {
+      "items": [
+        {
+          "type": "value",
+          "value": {
+            "type": "constant",
+            "value": 1,
+          },
+        },
+      ],
+      "type": "list",
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 != 2 > 1 != 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "not-equals",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 % 2 > 1 % 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "modulus",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 & 2 > 1 & 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "bit-and",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 * 2 > 1 * 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "multiplication",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 * MyParam * {MyParam} * [MyParam] * (1,2) > 1 * MyParam * {MyParam} * [MyParam] * (1,2) 1`] = `
+{
+  "left": {
+    "left": {
+      "left": {
+        "left": {
+          "type": "value",
+          "value": {
+            "type": "constant",
+            "value": 1,
+          },
+        },
+        "operator": "multiplication",
+        "right": {
+          "type": "value",
+          "value": {
+            "name": "MyParam",
+            "type": "parameter",
+          },
+        },
+        "type": "binary",
+      },
+      "operator": "multiplication",
+      "right": {
+        "type": "value",
+        "value": {
+          "name": "MyParam",
+          "type": "parameter",
+        },
+      },
+      "type": "binary",
+    },
+    "operator": "multiplication",
+    "right": {
+      "type": "value",
+      "value": {
+        "name": "MyParam",
+        "type": "parameter",
+      },
+    },
+    "type": "binary",
+  },
+  "operator": "multiplication",
+  "right": {
+    "type": "value",
+    "value": {
+      "items": [
+        {
+          "type": "value",
+          "value": {
+            "type": "constant",
+            "value": 1,
+          },
+        },
+        {
+          "type": "value",
+          "value": {
+            "type": "constant",
+            "value": 2,
+          },
+        },
+      ],
+      "type": "list",
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 ** 2 > 1 ** 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "exponentiation",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 + 2 > 1 + 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "addition",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 / 2 > 1 / 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "division",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 < 2 > 1 < 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "less-than",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 << 2 > 1 << 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "bit-left-shift",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 <= 2 > 1 <= 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "less-than-equal",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 <> 2 > 1 <> 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "not-equals",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 = 2 > 1 = 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "equals",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 > 2 > 1 > 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "more-than",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 >= 2 > 1 >= 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "more-than-equal",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 >> 2 > 1 >> 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "bit-right-shift",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 ^ 2 > 1 ^ 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "bit-xor",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 | 2 > 1 | 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "bit-or",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 - 2 > 1 - 2 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "subtraction",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 2,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex 1 not in (1,) > 1 not in (1,) 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": 1,
+    },
+  },
+  "operator": "not-in",
+  "right": {
+    "type": "value",
+    "value": {
+      "items": [
+        {
+          "type": "value",
+          "value": {
+            "type": "constant",
+            "value": 1,
+          },
+        },
+      ],
+      "type": "list",
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex MyFunction(1,2) > MyFunction(1,2) 1`] = `
+{
+  "arguments": [
+    {
+      "type": "value",
+      "value": {
+        "type": "constant",
+        "value": 1,
+      },
+    },
+    {
+      "type": "value",
+      "value": {
+        "type": "constant",
+        "value": 2,
+      },
+    },
+  ],
+  "name": "MyFunction",
+  "type": "function",
+}
+`;
+
+exports[`complex true && false > true && false 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": true,
+    },
+  },
+  "operator": "and",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex true || false > true || false 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": true,
+    },
+  },
+  "operator": "or",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex true and false > true and false 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": true,
+    },
+  },
+  "operator": "and",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "type": "binary",
+}
+`;
+
+exports[`complex true or false > true or false 1`] = `
+{
+  "left": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": true,
+    },
+  },
+  "operator": "or",
+  "right": {
+    "type": "value",
+    "value": {
+      "type": "constant",
+      "value": false,
+    },
+  },
+  "type": "binary",
+}
+`;

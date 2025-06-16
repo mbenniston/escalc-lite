@@ -11,8 +11,12 @@ function getTokens(s: string): Token[] {
 
 describe('literal', () => {
   test('reads number', () => {
-    expect(getTokens('1.23')).toStrictEqual([
+    expect(getTokens('1.23 .123 1e10 1.0e-20 1.e+10')).toStrictEqual([
       { type: 'literal', value: { type: 'number', value: '1.23' } },
+      { type: 'literal', value: { type: 'number', value: '.123' } },
+      { type: 'literal', value: { type: 'number', value: '1e10' } },
+      { type: 'literal', value: { type: 'number', value: '1.0e-20' } },
+      { type: 'literal', value: { type: 'number', value: '1.e+10' } },
     ] satisfies Token[])
   })
 
@@ -47,7 +51,9 @@ describe('literal', () => {
 describe('operator', () => {
   test('reads operators', () => {
     expect(
-      getTokens('+ - / * % ** < > <= >= in not ! != = ? <> & | && || ^ ~'),
+      getTokens(
+        '+ - / * % ** < > <= >= in not ! != = ? <> & | && || ^ ~ and or',
+      ),
     ).toStrictEqual([
       { type: 'operator', operator: '+' },
       { type: 'operator', operator: '-' },
@@ -72,6 +78,32 @@ describe('operator', () => {
       { type: 'operator', operator: '||' },
       { type: 'operator', operator: '^' },
       { type: 'operator', operator: '~' },
+      { type: 'operator', operator: '&&' },
+      { type: 'operator', operator: '||' },
     ] satisfies Token[])
+  })
+})
+
+describe('keywords', () => {
+  test('reads group open / close', () => {
+    expect(getTokens('()')).toStrictEqual([
+      { type: 'group-open' },
+      { type: 'group-close' },
+    ] satisfies Token[])
+  })
+  test('reads separators', () => {
+    expect(getTokens(';,')).toStrictEqual([
+      { type: 'separator' },
+      { type: 'separator' },
+    ] satisfies Token[])
+  })
+  test('reads group open / close', () => {
+    expect(getTokens('[MyParam1] {MyParam}')).toStrictEqual([
+      { type: 'parameter', name: 'MyParam1' },
+      { type: 'parameter', name: 'MyParam' },
+    ] satisfies Token[])
+  })
+  test('reads colon', () => {
+    expect(getTokens(':')).toStrictEqual([{ type: 'colon' }] satisfies Token[])
   })
 })
