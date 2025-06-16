@@ -1,4 +1,4 @@
-import { builtIns } from './tree-walker'
+import { builtIns } from '../evaluator/tree-walker'
 import type { LogicalExpression } from './logical-expression'
 
 const builtinFunctionNames = new Set(Object.keys(builtIns))

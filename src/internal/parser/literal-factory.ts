@@ -1,4 +1,4 @@
-import type { Token } from './token'
+import type { Token } from '../tokenizer/token'
 
 export type Literal = Extract<Token, { type: 'literal' }>['value']
 

@@ -1,4 +1,4 @@
-import type { LogicalExpression } from './logical-expression'
+import type { LogicalExpression } from '../parser/logical-expression'
 import type { ExpressionParameter, ValueCalculator } from './value-calculator'
 
 export type EvaluationOptions = {

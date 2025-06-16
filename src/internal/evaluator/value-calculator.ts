@@ -1,4 +1,4 @@
-import type { LogicalExpression } from './logical-expression'
+import type { LogicalExpression } from '../parser/logical-expression'
 
 export type ExpressionParameter = {
   expression: LogicalExpression

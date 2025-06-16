@@ -2,14 +2,14 @@ import Decimal from 'decimal.js'
 import { expect, test } from 'vitest'
 import { Expression } from '../src'
 import {
-  DefaultLiteralFactory,
-  type Literal,
-} from '../src/internal/literal-factory'
-
-import {
   DefaultValueCalculator,
   type ExpressionParameter,
-} from '../src/internal/value-calculator'
+} from '../src/internal/evaluator/value-calculator'
+
+import {
+  DefaultLiteralFactory,
+  type Literal,
+} from '../src/internal/parser/literal-factory'
 
 class DecimalLiteralFactory extends DefaultLiteralFactory {
   create(value: Literal): unknown {

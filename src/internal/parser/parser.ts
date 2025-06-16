@@ -1,7 +1,15 @@
-import { BufferedIterator, CharacterIterator, Tokenizer } from './tokenizer'
+import {
+  BufferedIterator,
+  CharacterIterator,
+  Tokenizer,
+} from '../tokenizer/tokenizer'
+import type { OperatorToken, Token } from '../tokenizer/token'
 import type { LiteralFactory } from './literal-factory'
-import type { LogicalExpression } from './logical-expression'
-import type { Token } from './token'
+import type {
+  BinaryExpression,
+  LogicalExpression,
+  UnaryExpression,
+} from './logical-expression'
 
 export type Scanner = BufferedIterator<Token>
 
@@ -55,10 +63,7 @@ function or(
   let left = and(scanner, literalFactory)
 
   const operators = ['||']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '||': 'or',
   } as const
 
@@ -81,10 +86,7 @@ function and(
   let left = comparison(scanner, literalFactory)
 
   const operators = ['&&']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '&&': 'and',
   } as const
 
@@ -108,10 +110,7 @@ function comparison(
   let left = bitOr(scanner, literalFactory)
 
   const operators = ['>', '<', '<=', '>=', '!=', '==', '=', '<>']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '>': 'more-than',
     '<': 'less-than',
     '<=': 'less-than-equal',
@@ -159,10 +158,7 @@ function bitOr(
   let left = bitXor(scanner, literalFactory)
 
   const operators = ['|']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '|': 'bit-or',
   } as const
 
@@ -186,10 +182,7 @@ function bitXor(
   let left = bitAnd(scanner, literalFactory)
 
   const operators = ['^']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '^': 'bit-xor',
   } as const
 
@@ -213,10 +206,7 @@ function bitAnd(
   let left = bitShift(scanner, literalFactory)
 
   const operators = ['&']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '&': 'bit-and',
   } as const
 
@@ -240,10 +230,7 @@ function bitShift(
   let left = additive(scanner, literalFactory)
 
   const operators = ['>>', '<<']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '>>': 'bit-right-shift',
     '<<': 'bit-left-shift',
   } as const
@@ -268,10 +255,7 @@ function additive(
   let left = factor(scanner, literalFactory)
 
   const operators = ['+', '-']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '+': 'addition',
     '-': 'subtraction',
   } as const
@@ -296,10 +280,7 @@ function factor(
   let left = exponentiation(scanner, literalFactory)
 
   const operators = ['/', '*', '%']
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'binary' }>['operator']
-  > = {
+  const operatorMap: Record<string, BinaryExpression['operator']> = {
     '*': 'multiplication',
     '/': 'division',
     '%': 'modulus',
@@ -338,10 +319,7 @@ function unary(
   scanner: Scanner,
   literalFactory: LiteralFactory,
 ): LogicalExpression {
-  const operatorMap: Record<
-    string,
-    Extract<LogicalExpression, { type: 'unary' }>['operator']
-  > = {
+  const operatorMap: Record<string, UnaryExpression['operator']> = {
     '!': 'not',
     '~': 'bit-complement',
     '-': 'negate',
@@ -469,7 +447,7 @@ function value(
 function matchOperators(
   scanner: Scanner,
   operators: string[],
-): Extract<Token, { type: 'operator' }> | null {
+): OperatorToken | null {
   const nextToken = scanner.peek
 
   if (

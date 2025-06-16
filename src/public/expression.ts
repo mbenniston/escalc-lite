@@ -1,20 +1,20 @@
-import { collectParameters } from '../internal/collect-parameters'
-import {
-  DefaultLiteralFactory,
-  type LiteralFactory,
-} from '../internal/literal-factory'
-import { parse } from '../internal/parser'
 import {
   builtIns,
   execute,
   type EvaluationOptions,
-} from '../internal/tree-walker'
+} from '../internal/evaluator/tree-walker'
 import {
   DefaultValueCalculator,
   type ExpressionParameter,
   type ValueCalculator,
-} from '../internal/value-calculator'
-import type { LogicalExpression } from '../internal/logical-expression'
+} from '../internal/evaluator/value-calculator'
+import { collectParameters } from '../internal/parser/collect-parameters'
+import {
+  DefaultLiteralFactory,
+  type LiteralFactory,
+} from '../internal/parser/literal-factory'
+import { parse } from '../internal/parser/parser'
+import type { LogicalExpression } from '../internal/parser/logical-expression'
 
 export class Expression {
   public static readonly BuiltIns = builtIns
