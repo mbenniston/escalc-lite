@@ -15,69 +15,79 @@ function formatAsMermaidInner(
   id: string,
 ): string {
   switch (expression.type) {
-    case 'value': {
-      switch (expression.value.type) {
-        case 'constant':
-          return `${id}[${JSON.stringify(expression.value.value)}]\n`
-        case 'parameter':
-          return `${id}["{${expression.value.name}}"]\n`
-        case 'list': {
-          const args = expression.value.items.map((arg, index) => {
-            const argId = `${id}.${index}`
-            const text = formatAsMermaidInner(arg, argId)
-            return [argId, text]
-          })
+    case 'value':
+      {
+        switch (expression.value.type) {
+          case 'constant':
+            return `${id}[${JSON.stringify(expression.value.value)}]\n`
+          case 'parameter':
+            return `${id}["{${expression.value.name}}"]\n`
+          case 'list': {
+            const args = expression.value.items.map((arg, index) => {
+              const argId = `${id}.${index}`
+              const text = formatAsMermaidInner(arg, argId)
+              return [argId, text]
+            })
 
-          const links = args
-            .map((arg, index) => `${id}["(...)"] --> |${index}| ${arg[0]}\n`)
-            .join('')
-          const argDefs = args.map((arg) => String(arg[1])).join('')
-          return links + argDefs
+            const links = args
+              .map((arg, index) => `${id}["(...)"] --> |${index}| ${arg[0]}\n`)
+              .join('')
+            const argDefs = args.map((arg) => String(arg[1])).join('')
+            return links + argDefs
+          }
         }
       }
-    }
-    case 'ternary': {
-      const leftName = `${id}.left`
-      const middleName = `${id}.middle`
-      const rightName = `${id}.right`
-      const left = formatAsMermaidInner(expression.left, leftName)
-      const middle = formatAsMermaidInner(expression.middle, middleName)
-      const right = formatAsMermaidInner(expression.right, rightName)
-      return `${id}[?] --> ${middleName}\n${id}[?] --> ${rightName}\n${left}${middle}${right}`
-    }
+      break
+    case 'ternary':
+      {
+        const leftName = `${id}.left`
+        const middleName = `${id}.middle`
+        const rightName = `${id}.right`
+        const left = formatAsMermaidInner(expression.left, leftName)
+        const middle = formatAsMermaidInner(expression.middle, middleName)
+        const right = formatAsMermaidInner(expression.right, rightName)
+        return `${id}[?] --> ${middleName}\n${id}[?] --> ${rightName}\n${left}${middle}${right}`
+      }
+      break
 
-    case 'binary': {
-      const leftName = `${id}.left`
-      const rightName = `${id}.right`
-      const left = formatAsMermaidInner(expression.left, leftName)
-      const right = formatAsMermaidInner(expression.right, rightName)
-      const operatorStr = `"${prettyOperator(expression.operator)}"`
-      return `${id}[${operatorStr}] --> ${leftName}\n${id}[${operatorStr}] --> ${rightName}\n${
-        left
-      }${right}`
-    }
-    case 'unary': {
-      const leftName = `${id}.1`
-      const left = formatAsMermaidInner(expression.expression, leftName)
-      const operatorStr = `"${prettyOperator(expression.operator)}"`
-      return `${id}[${operatorStr}] --> ${leftName}\n\n${left}`
-    }
-    case 'function': {
-      const args = expression.arguments.map((arg, index) => {
-        const argId = `${id}.${index}`
-        const text = formatAsMermaidInner(arg, argId)
-        return [argId, text]
-      })
+    case 'binary':
+      {
+        const leftName = `${id}.left`
+        const rightName = `${id}.right`
+        const left = formatAsMermaidInner(expression.left, leftName)
+        const right = formatAsMermaidInner(expression.right, rightName)
+        const operatorStr = `"${prettyOperator(expression.operator)}"`
+        return `${id}[${operatorStr}] --> ${leftName}\n${id}[${operatorStr}] --> ${rightName}\n${
+          left
+        }${right}`
+      }
+      break
+    case 'unary':
+      {
+        const leftName = `${id}.1`
+        const left = formatAsMermaidInner(expression.expression, leftName)
+        const operatorStr = `"${prettyOperator(expression.operator)}"`
+        return `${id}[${operatorStr}] --> ${leftName}\n\n${left}`
+      }
+      break
+    case 'function':
+      {
+        const args = expression.arguments.map((arg, index) => {
+          const argId = `${id}.${index}`
+          const text = formatAsMermaidInner(arg, argId)
+          return [argId, text]
+        })
 
-      const links = args
-        .map(
-          (arg, index) =>
-            `${id}[${expression.name}] --> |${index}| ${arg[0]}\n`,
-        )
-        .join('')
-      const argDefs = args.map((arg) => String(arg[1])).join('')
-      return links + argDefs
-    }
+        const links = args
+          .map(
+            (arg, index) =>
+              `${id}[${expression.name}] --> |${index}| ${arg[0]}\n`,
+          )
+          .join('')
+        const argDefs = args.map((arg) => String(arg[1])).join('')
+        return links + argDefs
+      }
+      break
   }
 }
 const prettyOperator = (
