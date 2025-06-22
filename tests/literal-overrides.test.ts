@@ -1,27 +1,28 @@
 import Decimal from 'decimal.js'
 import { expect, test } from 'vitest'
-import { Expression } from '../src'
 import {
   DefaultValueCalculator,
-  type ExpressionParameter,
-} from '../src/internal/evaluator/value-calculator'
+  ESCalcLiteBuiltIns,
+  ESCalcLiteDefaultLiteralFactory,
+  evaluate,
+  type ESCalcLiteExpressionParameter,
+  type ESCalcLiteLiteralTokenType,
+} from '../src'
 
-import {
-  DefaultLiteralFactory,
-  type Literal,
-} from '../src/internal/parser/literal-factory'
-
-class DecimalLiteralFactory extends DefaultLiteralFactory {
-  create(value: Literal): unknown {
-    if (value.type === 'number') {
-      return new Decimal(value.value)
+class DecimalLiteralFactory extends ESCalcLiteDefaultLiteralFactory {
+  create(type: ESCalcLiteLiteralTokenType, value: string): unknown {
+    if (type === 'number') {
+      return new Decimal(value)
     }
-    return super.create(value)
+    return super.create(type, value)
   }
 }
 
 class DecimalCalculator extends DefaultValueCalculator {
-  add(left: ExpressionParameter, right: ExpressionParameter): unknown {
+  add(
+    left: ESCalcLiteExpressionParameter,
+    right: ESCalcLiteExpressionParameter,
+  ): unknown {
     const leftValue = left.evaluate()
     const rightValue = right.evaluate()
 
@@ -31,7 +32,10 @@ class DecimalCalculator extends DefaultValueCalculator {
     return super.add(left, right)
   }
 
-  div(left: ExpressionParameter, right: ExpressionParameter): unknown {
+  div(
+    left: ESCalcLiteExpressionParameter,
+    right: ESCalcLiteExpressionParameter,
+  ): unknown {
     const leftValue = left.evaluate()
     const rightValue = right.evaluate()
 
@@ -41,7 +45,10 @@ class DecimalCalculator extends DefaultValueCalculator {
     return super.div(left, right)
   }
 
-  mul(left: ExpressionParameter, right: ExpressionParameter): unknown {
+  mul(
+    left: ESCalcLiteExpressionParameter,
+    right: ESCalcLiteExpressionParameter,
+  ): unknown {
     const leftValue = left.evaluate()
     const rightValue = right.evaluate()
 
@@ -51,7 +58,7 @@ class DecimalCalculator extends DefaultValueCalculator {
     return super.mul(left, right)
   }
 
-  negate(left: ExpressionParameter): unknown {
+  negate(left: ESCalcLiteExpressionParameter): unknown {
     const leftValue = left.evaluate()
 
     if (leftValue instanceof Decimal) {
@@ -60,7 +67,10 @@ class DecimalCalculator extends DefaultValueCalculator {
     return super.negate(left)
   }
 
-  sub(left: ExpressionParameter, right: ExpressionParameter): unknown {
+  sub(
+    left: ESCalcLiteExpressionParameter,
+    right: ESCalcLiteExpressionParameter,
+  ): unknown {
     const leftValue = left.evaluate()
     const rightValue = right.evaluate()
 
@@ -72,81 +82,82 @@ class DecimalCalculator extends DefaultValueCalculator {
 }
 
 test('custom decimal with builtin overrides', () => {
-  const expression = new Expression('Sin(3)', {
+  const result = evaluate('Sin(3)', {
     literalFactory: new DecimalLiteralFactory(),
-  })
-  expression.Calculator = new DecimalCalculator()
-  expression.Functions.Sin = (args, options) => {
-    const arg = args[0].evaluate()
-    if (arg instanceof Decimal) {
-      return arg.sin()
-    }
+    valueCalculator: new DecimalCalculator(),
+    functions: {
+      Sin: (args, options) => {
+        const arg = args[0].evaluate()
+        if (arg instanceof Decimal) {
+          return arg.sin()
+        }
 
-    return Expression.BuiltIns.Sin(args, options)
-  }
-  const result = expression.Evaluate()
+        return ESCalcLiteBuiltIns.Sin(args, options)
+      },
+    },
+  })
+
   if (!(result instanceof Decimal)) throw new Error('Expected decimal argument')
 
   expect(result.toSD(15).toString()).toBe('0.141120008059867')
 })
 
 test('evaluate with complex expression', () => {
-  const expression = new Expression(
+  const result = evaluate(
     '(((([a]+([b]*([c]-[d]/([e]+[f]))))-(([g]+[h])*([i]-([j]/([k]+[l]-[m])))))+([n]*([o]+[p]-([q]*[r]/([s]+[t])))))/((([u]+[v])*([w]-[x]+([y]/([z]+[aa]))))+([ab]-[ac]+([ad]/([ae]+[af]-[ag])))))+(([ah]*([ai]+[aj]-([ak]/([al]+[am]))))-(([an]+[ao])/([ap]-[aq]+[ar]))+[as])',
     {
       literalFactory: new DecimalLiteralFactory(),
+      valueCalculator: new DecimalCalculator(),
+      params: {
+        ['a']: new Decimal(2),
+        ['b']: new Decimal(3),
+        ['c']: new Decimal(14),
+        ['d']: new Decimal(6),
+        ['e']: new Decimal(1),
+        ['f']: new Decimal(1),
+        ['g']: new Decimal(5),
+        ['h']: new Decimal(2),
+        ['i']: new Decimal(20),
+        ['j']: new Decimal(8),
+        ['k']: new Decimal(1),
+        ['l']: new Decimal(2),
+        ['m']: new Decimal(1),
+        ['n']: new Decimal(4),
+        ['o']: new Decimal(7),
+        ['p']: new Decimal(5),
+        ['q']: new Decimal(2),
+        ['r']: new Decimal(6),
+        ['s']: new Decimal(1),
+        ['t']: new Decimal(1),
+        ['u']: new Decimal(5),
+        ['v']: new Decimal(5),
+        ['w']: new Decimal(30),
+        ['x']: new Decimal(10),
+        ['y']: new Decimal(6),
+        ['z']: new Decimal(2),
+        ['aa']: new Decimal(1),
+        ['ab']: new Decimal(40),
+        ['ac']: new Decimal(10),
+        ['ad']: new Decimal(18),
+        ['ae']: new Decimal(2),
+        ['af']: new Decimal(1),
+        ['ag']: new Decimal(1),
+        ['ah']: new Decimal(3),
+        ['ai']: new Decimal(9),
+        ['aj']: new Decimal(6),
+        ['ak']: new Decimal(10),
+        ['al']: new Decimal(2),
+        ['am']: new Decimal(3),
+        ['an']: new Decimal(7),
+        ['ao']: new Decimal(3),
+        ['ap']: new Decimal(10),
+        ['aq']: new Decimal(2),
+        ['ar']: new Decimal(2),
+        ['as']: new Decimal(5),
+      },
     },
   )
-  expression.Calculator = new DecimalCalculator()
-  expression.Parameters = {
-    ['a']: new Decimal(2),
-    ['b']: new Decimal(3),
-    ['c']: new Decimal(14),
-    ['d']: new Decimal(6),
-    ['e']: new Decimal(1),
-    ['f']: new Decimal(1),
-    ['g']: new Decimal(5),
-    ['h']: new Decimal(2),
-    ['i']: new Decimal(20),
-    ['j']: new Decimal(8),
-    ['k']: new Decimal(1),
-    ['l']: new Decimal(2),
-    ['m']: new Decimal(1),
-    ['n']: new Decimal(4),
-    ['o']: new Decimal(7),
-    ['p']: new Decimal(5),
-    ['q']: new Decimal(2),
-    ['r']: new Decimal(6),
-    ['s']: new Decimal(1),
-    ['t']: new Decimal(1),
-    ['u']: new Decimal(5),
-    ['v']: new Decimal(5),
-    ['w']: new Decimal(30),
-    ['x']: new Decimal(10),
-    ['y']: new Decimal(6),
-    ['z']: new Decimal(2),
-    ['aa']: new Decimal(1),
-    ['ab']: new Decimal(40),
-    ['ac']: new Decimal(10),
-    ['ad']: new Decimal(18),
-    ['ae']: new Decimal(2),
-    ['af']: new Decimal(1),
-    ['ag']: new Decimal(1),
-    ['ah']: new Decimal(3),
-    ['ai']: new Decimal(9),
-    ['aj']: new Decimal(6),
-    ['ak']: new Decimal(10),
-    ['al']: new Decimal(2),
-    ['am']: new Decimal(3),
-    ['an']: new Decimal(7),
-    ['ao']: new Decimal(3),
-    ['ap']: new Decimal(10),
-    ['aq']: new Decimal(2),
-    ['ar']: new Decimal(2),
-    ['as']: new Decimal(5),
-  }
 
-  const result = expression.Evaluate()
   if (!(result instanceof Decimal)) throw new Error('Expected decimal argument')
 
   expect(result.toSD(15).toString()).toBe('42.7953667953668')

@@ -1,5 +1,5 @@
 import { EvaluateOptions, Expression } from 'ncalcjs'
-import { bench, describe } from 'vitest'
+import { expect, test } from 'vitest'
 import { ESCalcLite } from '../src'
 
 const expression =
@@ -53,28 +53,11 @@ const parameters = {
   ['as']: 5,
 }
 
-describe('No pre-parsing', () => {
-  bench('escalc-lite', () => {
-    ESCalcLite.evaluate(expression, { params: parameters })
-  })
+test('escalc-lite', () => {
+  const expr2 = ESCalcLite.evaluate(expression, { params: parameters })
 
-  bench('ncalcjs', () => {
-    const expr = new Expression(expression, EvaluateOptions.NoCache)
-    expr.Parameters = parameters
-    expr.Evaluate()
-  })
-})
-
-describe('Pre-parsed', () => {
-  const expr2 = ESCalcLite.parse(expression)
   const expr = new Expression(expression, EvaluateOptions.NoCache)
+  expr.Parameters = parameters
 
-  bench('escalc-lite', () => {
-    ESCalcLite.evaluate(expr2, { params: parameters })
-  })
-
-  bench('ncalcjs', () => {
-    expr.Parameters = parameters
-    expr.Evaluate()
-  })
+  expect(expr.Evaluate()).toBe(expr2)
 })

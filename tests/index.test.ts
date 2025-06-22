@@ -1,8 +1,10 @@
 import { expect, test } from 'vitest'
-import { Expression } from '../src'
+import { ESCalcLite } from '../src'
 
 test('test ', () => {
-  const e = new Expression(String.raw`
+  expect(
+    ESCalcLite.evaluate(
+      String.raw`
 (
                             if([flagA] && [flagB], 1, 0) +
                             if([score] > 1000, Pow([score], 0.5), [score] * 1.5) +
@@ -60,202 +62,226 @@ test('test ', () => {
                             )
                           )
 
-  `)
-  e.Parameters = {
-    flagA: true,
-    flagB: false,
-    score: 1250,
-    region: 'EU',
-    x1: 0.5,
-    x2: 1,
-    x3: 0.3,
-    scaleFactor: 10,
-    delta: 50,
-    mean: 47.5,
-    isVIP: true,
-    bonus: 20,
-    userLevel: 8,
-    experience: 10000,
-    temp: 55,
-    val1: 2,
-    val2: 3,
-    val3: 4,
-    val4: 5,
-    divider: 4,
-    group: 'beta',
-    t1: 10,
-    t2: 11,
-    t3: 12,
-    t4: 13,
-    t5: 14,
-    t6: 15,
-    d1: 20,
-    d2: 5,
-    d3: 10,
-    e1: 2.5,
-    e2: 4,
-    x: 15,
-    y: 3,
-    z: 40,
-    flagC: false,
-    state: 'active',
-    role: 'admin',
-    accessLevel: 3,
-    term1: 1,
-    term2: 2,
-    term3: 3,
-    term4: 4,
-    term5: 5,
-    term6: 6,
-    term7: 7,
-    term8: 8,
-    term9: 9,
-    term10: 10,
-    term11: 11,
-    term12: 12,
-    mass1: 10,
-    accel1: 2,
-    mass2: 15,
-    accel2: 1.5,
-    mass3: 5,
-    accel3: 3,
-    force1: 100,
-    area1: 10,
-    force2: 200,
-    area2: 20,
-    xPos1: 5,
-    xPos2: 1,
-    yPos1: 7,
-    yPos2: 3,
-    speed: 120,
-    dangerLevel: 8,
-    noise1: 2,
-    noise2: 3,
-    noise3: 5,
-    signal1: 10,
-    signal2: 5,
-    env: 'prod',
-    retries: 1,
-    timeout: 100,
-    val_1: 1,
-    val_2: 2,
-    val_3: 3,
-    val_4: 4,
-    val_5: 5,
-    val_6: 6,
-    val_7: 7,
-    val_8: 8,
-    val_9: 9,
-    val_10: 10,
-  }
-
-  expect(e.Evaluate()).toBeCloseTo(1244.734077454038, 3)
+  `,
+      {
+        params: {
+          flagA: true,
+          flagB: false,
+          score: 1250,
+          region: 'EU',
+          x1: 0.5,
+          x2: 1,
+          x3: 0.3,
+          scaleFactor: 10,
+          delta: 50,
+          mean: 47.5,
+          isVIP: true,
+          bonus: 20,
+          userLevel: 8,
+          experience: 10000,
+          temp: 55,
+          val1: 2,
+          val2: 3,
+          val3: 4,
+          val4: 5,
+          divider: 4,
+          group: 'beta',
+          t1: 10,
+          t2: 11,
+          t3: 12,
+          t4: 13,
+          t5: 14,
+          t6: 15,
+          d1: 20,
+          d2: 5,
+          d3: 10,
+          e1: 2.5,
+          e2: 4,
+          x: 15,
+          y: 3,
+          z: 40,
+          flagC: false,
+          state: 'active',
+          role: 'admin',
+          accessLevel: 3,
+          term1: 1,
+          term2: 2,
+          term3: 3,
+          term4: 4,
+          term5: 5,
+          term6: 6,
+          term7: 7,
+          term8: 8,
+          term9: 9,
+          term10: 10,
+          term11: 11,
+          term12: 12,
+          mass1: 10,
+          accel1: 2,
+          mass2: 15,
+          accel2: 1.5,
+          mass3: 5,
+          accel3: 3,
+          force1: 100,
+          area1: 10,
+          force2: 200,
+          area2: 20,
+          xPos1: 5,
+          xPos2: 1,
+          yPos1: 7,
+          yPos2: 3,
+          speed: 120,
+          dangerLevel: 8,
+          noise1: 2,
+          noise2: 3,
+          noise3: 5,
+          signal1: 10,
+          signal2: 5,
+          env: 'prod',
+          retries: 1,
+          timeout: 100,
+          val_1: 1,
+          val_2: 2,
+          val_3: 3,
+          val_4: 4,
+          val_5: 5,
+          val_6: 6,
+          val_7: 7,
+          val_8: 8,
+          val_9: 9,
+          val_10: 10,
+        },
+      },
+    ),
+  ).toBeCloseTo(1244.734077454038, 3)
 })
 
 test('complex3', () => {
-  const e =
-    new Expression(String.raw`if([isAdmin] && ([userAge] > 18 || [hasParentalConsent]), 
+  expect(
+    ESCalcLite.evaluate(
+      String.raw`if([isAdmin] && ([userAge] > 18 || [hasParentalConsent]), 
     (Pow([baseValue] + Log([multiplier] * [delta]), 2) / (Abs([threshold] - [currentValue]) + 1)) + 
     Sin([angle]) * (if([isPremium], [premiumFactor], 1.25)) + 
     ( [region] = 'US' || [region] = 'CA' || [region] = 'UK' ? 100 : 50 ), 
     -999
-)`)
-  e.Parameters = {
-    isAdmin: true,
-    userAge: 17,
-    hasParentalConsent: true,
-    baseValue: 10,
-    multiplier: 2,
-    delta: 1.5,
-    threshold: 25,
-    currentValue: 20,
-    angle: 1.5708,
-    isPremium: false,
-    premiumFactor: 1.75,
-    region: 'US',
-  }
-  expect(e.Evaluate()).toBeCloseTo(121.78, 2)
+)`,
+      {
+        params: {
+          isAdmin: true,
+          userAge: 17,
+          hasParentalConsent: true,
+          baseValue: 10,
+          multiplier: 2,
+          delta: 1.5,
+          threshold: 25,
+          currentValue: 20,
+          angle: 1.5708,
+          isPremium: false,
+          premiumFactor: 1.75,
+          region: 'US',
+        },
+      },
+    ),
+  ).toBeCloseTo(121.78, 2)
 })
 
 test('test escape ', () => {
-  const es = `"hello\\\\ \\t \\r worlds"`
-  const e = new Expression(es)
-  expect(e.Evaluate()).toStrictEqual(`hello\\ \t \r worlds`)
+  expect(ESCalcLite.evaluate(`"hello\\\\ \\t \\r worlds"`)).toStrictEqual(
+    `hello\\ \t \r worlds`,
+  )
 })
 
 test('test parameter collect ', () => {
-  const e = new Expression(
-    '{1} + {2} ? MyFunction([3]) : -AnotherFunction([4]) + ![5]',
+  const e = ESCalcLite.parameters(
+    ESCalcLite.parse(
+      '{1} + {2} ? MyFunction([3]) : -AnotherFunction([4]) + ![5]',
+    ),
   )
-  expect([...e.RequiredParameters]).toStrictEqual(['1', '2', '3', '4', '5'])
-  expect([...e.RequiredFunctions]).toStrictEqual([
-    'MyFunction',
-    'AnotherFunction',
-  ])
+  expect([...e.parameters]).toStrictEqual(['1', '2', '3', '4', '5'])
+  expect([...e.functions]).toStrictEqual(['MyFunction', 'AnotherFunction'])
 })
 
 test('test builtins ', () => {
-  const e = new Expression('1  In {1}')
-  e.Parameters['1'] = [1, 2, 3]
-  expect(e.Evaluate()).toStrictEqual(true)
+  expect(
+    ESCalcLite.evaluate('1  In {1}', {
+      params: {
+        ['1']: [1, 2, 3],
+      },
+    }),
+  ).toStrictEqual(true)
 })
 
 test('test separators ', () => {
-  const e = new Expression('"Hello" in (0,)')
-  e.Parameters = { foo: 0 }
-  expect(e.Evaluate()).toStrictEqual(false)
+  expect(
+    ESCalcLite.evaluate('"Hello" in (0,)', { params: { foo: 0 } }),
+  ).toStrictEqual(false)
 })
 
 test('operators ', () => {
-  const e = new Expression('2 ** 3 ** 2')
-  expect(e.Evaluate()).toStrictEqual(512)
+  expect(ESCalcLite.evaluate('2 ** 3 ** 2')).toStrictEqual(512)
 })
 
 test('test date comparison', () => {
-  const e = new Expression(
-    '#2024-06-15# >= #2024-06-01# && #2024-06-15# <= #2024-12-31#',
-  )
-  expect(e.Evaluate()).toStrictEqual(true)
+  expect(
+    ESCalcLite.evaluate(
+      '#2024-06-15# >= #2024-06-01# && #2024-06-15# <= #2024-12-31#',
+    ),
+  ).toStrictEqual(true)
+})
+
+test('test date comparison2', () => {
+  expect(ESCalcLite.parse('1')).toStrictEqual({
+    type: 'value',
+    value: { type: 'constant', value: 1 },
+  })
+
+  expect(
+    ESCalcLite.evaluate(
+      '#2024-06-15# >= #2024-06-01# && #2024-06-15# <= #2024-12-31#',
+    ),
+  ).toStrictEqual(true)
 })
 
 test('test complex2', () => {
-  const ast = new Expression(
-    'Max(' +
+  expect(
+    ESCalcLite.evaluate(
       'Max(' +
-      'Max(' +
-      'Max(' +
-      'Abs([a] - Sqrt([b] * [c])),' +
-      'Sin([d] + [e]) * Cos([f] - [g])' +
-      '),' +
-      '(([h] + [i]) ^ 2) / Ln([j] + 10)' +
-      '),' +
-      'Min([k], [l] + [m] * 2)' +
-      '),' +
-      'Ln(Sqrt(Abs([n] - [o] + Min([p], [q]))))' +
-      ') + Sqrt(Abs([r] - [s] / Max([t], 1)))',
-  )
-
-  ast.Parameters = {
-    ['a']: 25,
-    ['b']: 4,
-    ['c']: 9,
-    ['d']: Math.PI / 2,
-    ['e']: 0,
-    ['f']: 0,
-    ['g']: 0,
-    ['h']: 2,
-    ['i']: 3,
-    ['j']: 5,
-    ['k']: 20,
-    ['l']: 6,
-    ['m']: 2,
-    ['n']: 18,
-    ['o']: 4,
-    ['p']: 3,
-    ['q']: 10,
-    ['r']: 20,
-    ['s']: 5,
-    ['t']: 0,
-  }
-  expect(ast.Evaluate()).toBeCloseTo(22.872983346207416, 3)
+        'Max(' +
+        'Max(' +
+        'Max(' +
+        'Abs([a] - Sqrt([b] * [c])),' +
+        'Sin([d] + [e]) * Cos([f] - [g])' +
+        '),' +
+        '(([h] + [i]) ^ 2) / Ln([j] + 10)' +
+        '),' +
+        'Min([k], [l] + [m] * 2)' +
+        '),' +
+        'Ln(Sqrt(Abs([n] - [o] + Min([p], [q]))))' +
+        ') + Sqrt(Abs([r] - [s] / Max([t], 1)))',
+      {
+        params: {
+          ['a']: 25,
+          ['b']: 4,
+          ['c']: 9,
+          ['d']: Math.PI / 2,
+          ['e']: 0,
+          ['f']: 0,
+          ['g']: 0,
+          ['h']: 2,
+          ['i']: 3,
+          ['j']: 5,
+          ['k']: 20,
+          ['l']: 6,
+          ['m']: 2,
+          ['n']: 18,
+          ['o']: 4,
+          ['p']: 3,
+          ['q']: 10,
+          ['r']: 20,
+          ['s']: 5,
+          ['t']: 0,
+        },
+      },
+    ),
+  ).toBeCloseTo(22.872983346207416, 3)
 })
