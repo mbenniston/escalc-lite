@@ -23,7 +23,7 @@ export function execute(
     params = {},
     functions = {},
     lazyParams = {},
-    valueCalculator = new DefaultValueCalculator(),
+    valueCalculator = new ESCalcLiteDefaultValueCalculator(),
   } = options ?? {}
   switch (expression.type) {
     case 'value':
@@ -368,7 +368,9 @@ export interface ESCalcLiteValueCalculator {
   negate: (left: ESCalcLiteExpressionParameter) => unknown
 }
 
-export class DefaultValueCalculator implements ESCalcLiteValueCalculator {
+export class ESCalcLiteDefaultValueCalculator
+  implements ESCalcLiteValueCalculator
+{
   modulus(
     left: ESCalcLiteExpressionParameter,
     right: ESCalcLiteExpressionParameter,

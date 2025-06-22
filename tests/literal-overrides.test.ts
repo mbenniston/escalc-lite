@@ -1,13 +1,15 @@
 import Decimal from 'decimal.js'
 import { expect, test } from 'vitest'
 import {
-  DefaultValueCalculator,
-  ESCalcLiteBuiltIns,
   ESCalcLiteDefaultLiteralFactory,
   evaluate,
-  type ESCalcLiteExpressionParameter,
   type ESCalcLiteLiteralTokenType,
 } from '../src'
+import {
+  ESCalcLiteBuiltIns,
+  ESCalcLiteDefaultValueCalculator,
+  type ESCalcLiteExpressionParameter,
+} from '../src/execute'
 
 class DecimalLiteralFactory extends ESCalcLiteDefaultLiteralFactory {
   create(type: ESCalcLiteLiteralTokenType, value: string): unknown {
@@ -18,7 +20,7 @@ class DecimalLiteralFactory extends ESCalcLiteDefaultLiteralFactory {
   }
 }
 
-class DecimalCalculator extends DefaultValueCalculator {
+class DecimalCalculator extends ESCalcLiteDefaultValueCalculator {
   add(
     left: ESCalcLiteExpressionParameter,
     right: ESCalcLiteExpressionParameter,
