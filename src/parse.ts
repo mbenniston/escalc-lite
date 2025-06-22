@@ -380,10 +380,10 @@ export class Parser {
           if (this.lexer.peek?.type !== 'separator') break
           this.lexer.next()
         }
-      }
 
-      if (!this.match('group-close')) {
-        throw new Error(`Expected group-close got ${this.lexer.peek}`)
+        if (!this.match('group-close')) {
+          throw new Error(`Expected group-close got ${this.lexer.peek}`)
+        }
       }
 
       return { type: 'function', name: identifier.value, arguments: args }
