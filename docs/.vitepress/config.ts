@@ -6,6 +6,7 @@ import {
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  base: '/escalc-lite',
   rewrites: {
     'index.md': 'index.md',
   },
