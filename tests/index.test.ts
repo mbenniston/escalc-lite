@@ -1,6 +1,10 @@
 import { expect, test } from 'vitest'
 import { ESCalcLite } from '../src'
 
+test('Throw error when invalid', () => {
+  expect(() => ESCalcLite.evaluate('2 Log(2)')).toThrow()
+})
+
 test('test ', () => {
   expect(
     ESCalcLite.evaluate(

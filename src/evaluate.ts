@@ -36,7 +36,7 @@ export function evaluate(
       ? new Parser(
           expression,
           options?.literalFactory ?? new ESCalcLiteDefaultLiteralFactory(),
-        ).logicalExpression()
+        ).parse()
       : expression
 
   return execute(expr, options)

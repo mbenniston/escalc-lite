@@ -75,7 +75,7 @@ export function parse(
     expression,
     options?.literalFactory ?? new ESCalcLiteDefaultLiteralFactory(),
   )
-  return parser.logicalExpression()
+  return parser.parse()
 }
 
 export function parseSafe(
@@ -99,6 +99,17 @@ export class Parser {
     private readonly literalFactory: ESCalcLiteLiteralFactory,
   ) {
     this.lexer = new Lexer(expression)
+  }
+
+  parse(): ESCalcLiteLogicalExpression {
+    const expression = this.logicalExpression()
+    if (this.lexer.peek !== null) {
+      throw new Error(
+        `Unexpected end of input ${JSON.stringify(this.lexer.peek)}`,
+      )
+    }
+
+    return expression
   }
 
   logicalExpression(): ESCalcLiteLogicalExpression {
