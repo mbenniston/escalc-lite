@@ -1,6 +1,6 @@
 ### Demo
 
-You can try EScalc in the docs in the [Demo](./demo.md) page.
+You can try ESCalc in the [Demo](./demo.md) page.
 
 ## Installation 
 

@@ -1,6 +1,7 @@
 import { Lexer, type Token, type TokenType } from './lexer'
 
 export type ESCalcLiteParseOptions = Partial<{
+  // Factory that creates literals values such as numbers and booleans
   literalFactory: ESCalcLiteLiteralFactory
 }>
 

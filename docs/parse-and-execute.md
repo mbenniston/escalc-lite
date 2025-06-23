@@ -29,11 +29,11 @@ console.log(result)
 ### Parse
 
 ```ts
-<!-- @include: ../src/parse.ts{3,5} -->
+<!-- @include: ../src/parse.ts{3,6} -->
 ```
 
 ### Execute
 
 ```ts
-<!-- @include: ../src/execute.ts{4,9} -->
+<!-- @include: ../src/execute.ts{5,14} -->
 ```

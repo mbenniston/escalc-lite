@@ -1,10 +1,15 @@
+import type { ESCalcLiteParameter } from './evaluate'
 import type { ESCalcLiteLogicalExpression } from './parse'
 export type ESCalcLiteResult = unknown
 
 export type ESCalcLiteExecuteOptions = Partial<{
-  params: Record<string, unknown>
+  // Map of parameters that are used when executing the expression
+  params: Record<string, ESCalcLiteParameter>
+  // Map of parameters that are evaluated on demand
   lazyParams: Record<string, ESCalcLiteLazyParameter>
+  // Map of functions that are used when executing the expression
   functions: Record<string, ESCalcLiteExpressionFunction>
+  // A set of operators that can be overridden to change how they behave when execution an expression
   valueCalculator: ESCalcLiteValueCalculator
 }>
 
